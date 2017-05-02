@@ -1,15 +1,15 @@
 /**
  *
  */
-function Transaction(accountCurr, symbol, tradeDate, amount, usdRate) {
+function Transaction(accountCurr, securityID, tradeDate, amount, usdRate) {
     this.accountCurr = accountCurr;
-    this.symbol = symbol;
+    this.securityID = securityID;
     this.tradeDate = tradeDate;
     this.amount = amount;
     this.usdRate = (typeof usdRate !== 'undefined') ?  usdRate : null;
 }
 Transaction.prototype.getAccountCurr = function() { return this.accountCurr; };
-Transaction.prototype.getSymbol = function() { return this.symbol; };
+Transaction.prototype.getSecurityID = function() { return this.securityID; };
 Transaction.prototype.getTradeDate = function() { return this.tradeDate; };
 Transaction.prototype.getAmount = function() { return this.amount; };
 Transaction.prototype.getUSDRate = function() { return this.usdRate; };
@@ -32,20 +32,25 @@ Transaction.prototype.getQuantity = function() { return this.quantity; };
 
 
 /**
- * @param quantity - optional
+ * @param usdRate - optional
  */
-function Interest(accountCurr, symbol, tradeDate, amount, usdRate) {
-    var transaction = new Transaction (accountCurr, symbol, tradeDate, amount, usdRate);
-    this.quantity = (typeof quantity !== 'undefined') ?  quantity : null;
+function Interest(accountCurr, source, tradeDate, amount, usdRate) {
+    var transaction = new Transaction (accountCurr, source, tradeDate, amount, usdRate);
 }
-Transaction.prototype.getQuantity = function() { return this.quantity; };
 
 
 
 /**
+ * @param usdRate - optional
+ */
+function CarryCharge(accountCurr, source, tradeDate, amount, usdRate) {
+    var transaction = new Transaction (accountCurr, source, tradeDate, amount, usdRate);
+}
+
+/**
  * TODO: add support for commission, exchange traded debentures
  * @param amount - optional. net amount of order (after commission)
- * @param usdDate - optional
+ * @param usdRate - optional
  */
 function Order(accountCurr, symbol, tradeDate, amount, quantity, usdRate) {
     var transaction = new Transaction (accountCurr, symbol, tradeDate, amount, usdRate);
@@ -60,7 +65,7 @@ Transaction.prototype.getRGL = function() { return this.rgl; };
 /**
  * TODO: add commission support
  * @param amount - optional. net amount of order (after commission)
- * @param usdDate - optional
+ * @param usdRate - optional
  */
 function OptionOrder(accountCurr, symbol, tradeDate, amount, quantity, usdRate, multiplier) {
     var transaction = new Transaction (accountCurr, symbol, tradeDate, amount, usdRate);
@@ -71,3 +76,9 @@ function OptionOrder(accountCurr, symbol, tradeDate, amount, quantity, usdRate, 
 Transaction.prototype.getQuantity = function() { return this.quantity; };
 Transaction.prototype.getRGL = function() { return this.rgl; };
 Transaction.prototype.getMultiplier = function() { return this.multiplier; };
+
+/**
+ *
+ */
+Transaction.prototype.getUnderlyingSymbol = function() {
+};
