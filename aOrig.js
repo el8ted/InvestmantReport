@@ -38,9 +38,6 @@ function getGainLoss(symbol) {
     var totalQuantity = 0, totalBookValue = 0, avgCostPerQuantity = 0, totalGainLoss = 0;
     var nextDate, date, amount = 0, quantity = 0, gainLoss = 0, fxRate = 0;
 
-    if (symbol == "CALL-100MSFT'11MY@26")
-        ;
-
     for (j = 0; j < transactionList.length; j++) {
         if (j+1 < transactionList.length)
             nextDate = transactionList[j+1][0];
