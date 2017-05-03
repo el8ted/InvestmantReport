@@ -7,6 +7,7 @@ var TransactionListColumn = {'TRADE_DATE': 0, 'ACCOUNT': 1, 'SECURITY_ID': 2, 'A
                              'QUANTITY': 4, 'DIVIDEND': 5, 'USD_RATE': 6};
 
 
+
 var report = new InvestmentReport();
 var transactionList = null;
 
@@ -15,19 +16,20 @@ var transactionList = null;
  */
 function runReport() {
   report = new InvestmentReport();
-  transactionList = loadAllTransactionsOnSheet();
+  transactionList = loadAllTransactionsFromActiveSheet();
 
   var k = 0;
   while (k < transactionList.length) {
-    addTransactionFromSheet(transactionList[k]);
+    addTransaction(transactionList[k]);
     k++;
   }
 }
 
+
 /**
  * @return {Array.<T>} returns sorted list of transactions. sorted from oldest to nearest (i.e. jan - dec)
  */
-var loadAllTransactionsOnSheet = function() {
+var loadAllTransactionsFromActiveSheet = function() {
   SpreadsheetApp.setActiveSheet( SpreadsheetApp.getActiveSpreadsheet().getSheetByName("2011 New")); // For debug mode only
   transactionList = SpreadsheetApp.getActiveSheet().getRange(TransactionRange).getValues();
 
@@ -44,10 +46,11 @@ var loadAllTransactionsOnSheet = function() {
   return transactionList;
 };
 
+
 /**
  * @param transaction
  */
-var addTransactionFromSheet = function(transaction) {
+var addTransaction = function(transaction) {
   if ((transaction[TransactionListColumn.AMOUNT !== null]) &&
     (transaction[TransactionListColumn.QUANTITY === null]) &&
     (transaction[TransactionListColumn.DIVIDEND !== null])) {
@@ -58,9 +61,6 @@ var addTransactionFromSheet = function(transaction) {
       report.addTransaction(new CarryChargeTransaction(transaction));
     return;
   }
-
-  var temp = new DividendTransaction(transaction);
-  temp.getTransactionType();
 
   if (transaction[TransactionListColumn.DIVIDEND] !== null)
     report.addTransaction(new DividendTransaction(transaction));

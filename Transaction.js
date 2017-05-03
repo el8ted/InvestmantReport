@@ -27,7 +27,7 @@ function DividendTransaction(accountCurr, symbol, tradeDate, amount, amountWithh
   this.amountWithheld = (typeof amountWithheld !== 'undefined') ?  amountWithheld : null;
   this.quantity = (typeof quantity !== 'undefined') ?  quantity : null;
 }
-Transaction.prototype.getTransactionType = function() { return 'DIVIDEND'; };
+DividendTransaction.prototype.getTransactionType = function() { return 'DIVIDEND'; };
 DividendTransaction.prototype.getAmountWithheld = function() { return this.amountWithheld; };
 DividendTransaction.prototype.getQuantity = function() { return this.quantity; };
 
@@ -39,7 +39,7 @@ DividendTransaction.prototype.getQuantity = function() { return this.quantity; }
 function InterestTransaction(accountCurr, source, tradeDate, amount, usdRate) {
   this.transaction = new Transaction (accountCurr, source, tradeDate, amount, usdRate);
 }
-Transaction.prototype.getTransactionType = function() { return 'INTEREST'; };
+InterestTransaction.prototype.getTransactionType = function() { return 'INTEREST'; };
 
 
 
@@ -49,7 +49,7 @@ Transaction.prototype.getTransactionType = function() { return 'INTEREST'; };
 function CarryChargeTransaction(accountCurr, source, tradeDate, amount, usdRate) {
   this.transaction = new Transaction (accountCurr, source, tradeDate, amount, usdRate);
 }
-Transaction.prototype.getTransactionType = function() { return 'CARRY_CHARGE'; };
+CarryChargeTransaction.prototype.getTransactionType = function() { return 'CARRY_CHARGE'; };
 
 /**
  * TODO: add support for commission, exchange traded debentures
@@ -61,7 +61,7 @@ function OrderTransaction(accountCurr, symbol, tradeDate, amount, quantity, usdR
   this.quantity = (typeof quantity !== 'undefined') ?  quantity : null;
   this.rgl = null;
 }
-Transaction.prototype.getTransactionType = function() { return 'ORDER'; };
+OrderTransaction.prototype.getTransactionType = function() { return 'ORDER'; };
 OrderTransaction.prototype.getQuantity = function() { return this.quantity; };
 OrderTransaction.prototype.getRGL = function() { return this.rgl; };
 
@@ -73,10 +73,10 @@ OrderTransaction.prototype.getRGL = function() { return this.rgl; };
  * @param usdRate - optional
  */
 function OptionOrderTransaction(accountCurr, symbol, tradeDate, amount, quantity, usdRate, multiplier) {
-  this.optionOrder = new Order (accountCurr, symbol, tradeDate, amount, usdRate);
+  this.transaction = new Order (accountCurr, symbol, tradeDate, amount, usdRate);
   this.multiplier = (typeof multiplier !== 'undefined') ? multiplier : null;
 }
-Transaction.prototype.getTransactionType = function() { return 'OPTION_ORDER'; };
+OptionOrderTransaction.prototype.getTransactionType = function() { return 'OPTION_ORDER'; };
 OptionOrderTransaction.prototype.getQuantity = function() { return this.quantity; };
 OptionOrderTransaction.prototype.getRGL = function() { return this.rgl; };
 OptionOrderTransaction.prototype.getMultiplier = function() { return this.multiplier; };
