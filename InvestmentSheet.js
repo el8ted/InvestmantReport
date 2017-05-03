@@ -14,7 +14,7 @@ var transactionList = null;
  *
  */
 function runReport() {
-  var report = new InvestmentReport();
+  report = new InvestmentReport();
   transactionList = loadAllTransactionsOnSheet();
 
   var k = 0;
@@ -35,8 +35,8 @@ var loadAllTransactionsOnSheet = function() {
   transactionList.splice(0, 1);
 
   for (i = transactionList.length - 1; i >= 0; --i) {
-    if ((transactionList[i][0] == "") && (transactionList[i][1] == "") && (transactionList[i][2] == "") && (transactionList[i][3] == "") &&
-      (transactionList[i][4] == "") && (transactionList[i][5] == "") && (transactionList[i][6] == ""))
+    if ((transactionList[i][0] === "") && (transactionList[i][1] === "") && (transactionList[i][2] === "") && (transactionList[i][3] === "") &&
+        (transactionList[i][4] === "") && (transactionList[i][5] === "") && (transactionList[i][6] === ""))
       transactionList.splice(i, 1);
   }
 

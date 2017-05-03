@@ -57,7 +57,7 @@ TransactionDB.prototype.getTransactionType = function(transaction) {
 TransactionDB.prototype.getUniqueSecurityIDs = function (type) {
   var list = {};
 
-  for (i = 0; i < this.transactions[type].length; i++) {
+  for (var i = 0; i < this.transactions[type].length; i++) {
     var UID =  this.transactions[type][i]['ACCOUNT_CURR'] + this.transactions[type][i]['SECURITY_ID-'];
 
     if (!(UID in list.indexOf))
