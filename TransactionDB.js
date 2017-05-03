@@ -61,6 +61,6 @@ TransactionDB.prototype.getUniqueSecurityIDs = function (type) {
     var UID =  this.transactions[type][i]['ACCOUNT_CURR'] + this.transactions[type][i]['SECURITY_ID-'];
 
     if (!(UID in list.indexOf))
-        list.push(UID);
+      list.push(UID);
   }
 };
