@@ -3,20 +3,29 @@
  */
 
 /**
+ * Security object
+ */a
+function Security(accountCurrency, securityID) {
+  this.accountCurrency = accountCurrency;
+  this.securityID = securityID;
+}
+
+Security.prototype.getAccountCurrency = function() { return this.accountCurrency; };
+Security.prototype.getSecurityID = function() { return this.securityID; };
+
+/**
  * Base transection object
  */
 //var BaseTransaction = (function() {
-  function BaseTransaction(accountCurr, securityID, tradeDate, amount, usdRate) {
-    this.accountCurrency = accountCurr;
-    this.securityID = securityID;
+  function BaseTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
+    this.security = new Security(accountCurrency, securityID);
     this.tradeDate = tradeDate;
     this.amount = amount;
     this.usdRate = (typeof usdRate !== 'undefined') ?  usdRate : null;
   }
 
   BaseTransaction.prototype.getTransactionType = function() { return 'TRANSACTION'; };
-  BaseTransaction.prototype.getAccountCurr = function() { return this.accountCurrency; };
-  BaseTransaction.prototype.getSecurityID = function() { return this.securityID; };
+  BaseTransaction.prototype.getSecurity = function() { return this.security; };
   BaseTransaction.prototype.getTradeDate = function() { return this.tradeDate; };
   BaseTransaction.prototype.getAmount = function() { return this.amount; };
   BaseTransaction.prototype.getUSDRate = function() { return this.usdRate; };
@@ -40,10 +49,12 @@
       }
     }
 
-    this.transaction = new BaseTransaction(accountCurrency, symbol, tradeDate, amount, usdRate);
+    BaseTransaction.call(this, accountCurrency, symbol, tradeDate, amount, usdRate);
     this.quantity = (typeof quantity !== 'undefined') ?  quantity : null;
   }
 
+  DividendTransaction.prototype = Object.create(BaseTransaction.prototype);
+  DividendTransaction.prototype.constructor = DividendTransaction;
   DividendTransaction.prototype.getTransactionType = function() { return 'DIVIDEND'; };
   DividendTransaction.prototype.getAmountWithheld = function() { return this.amountWithheld; };
   DividendTransaction.prototype.getQuantity = function() { return this.quantity; };
@@ -55,9 +66,11 @@
    * @param usdRate - optional
    */
   function InterestTransaction(accountCurrency, tradeDate, amount, usdRate) {
-    this.transaction = new BaseTransaction(accountCurrency, tradeDate, amount, usdRate);
+    BaseTransaction.call(this, accountCurrency, tradeDate, amount, usdRate);
   }
 
+  InterestTransaction.prototype = Object.create(BaseTransaction.prototype);
+  InterestTransaction.prototype.constructor = InterestTransaction;
   InterestTransaction.prototype.getTransactionType = function() { return 'INTEREST'; };
 //})();
 
@@ -67,9 +80,11 @@
    * @param usdRate - optional
    */
   function CarryChargeTransaction(accountCurrency, tradeDate, amount, usdRate) {
-    this.transaction = new BaseTransaction(accountCurrency, tradeDate, amount, usdRate);
+    BaseTransaction.call(this, accountCurrency, tradeDate, amount, usdRate);
   }
 
+  CarryChargeTransaction.prototype = Object.create(BaseTransaction.prototype);
+  CarryChargeTransaction.prototype.constructor = CarryChargeTransaction;
   CarryChargeTransaction.prototype.getTransactionType = function() { return 'CARRY_CHARGE'; };
 //})();
 
@@ -81,11 +96,13 @@
    * @param usdRate - optional
    */
   function OrderTransaction(accountCurrency, symbol, tradeDate, amount, quantity, usdRate) {
-    this.transaction = new BaseTransaction(accountCurrency, symbol, tradeDate, amount, usdRate);
+    BaseTransaction.call(this, accountCurrency, symbol, tradeDate, amount, usdRate);
     this.quantity = (typeof quantity !== 'undefined') ?  quantity : null;
     this.realizedGainLoss = null;
   }
 
+  OrderTransaction.prototype = Object.create(BaseTransaction.prototype);
+  OrderTransaction.prototype.constructor = OrderTransaction;
   OrderTransaction.prototype.getTransactionType = function() { return 'ORDER'; };
   OrderTransaction.prototype.getQuantity = function() { return this.quantity; };
   OrderTransaction.prototype.getRealizedGainLoss = function() { return this.realizedGainLoss; };
@@ -99,10 +116,12 @@
    * @param usdRate - optional
    */
   function OptionOrderTransaction(accountCurrency, symbol, tradeDate, amount, quantity, usdRate, multiplier) {
-    this.transaction = new Order (accountCurrency, symbol, tradeDate, amount, quantity, usdRate);
+    OrderTransaction.call(this, accountCurrency, symbol, tradeDate, amount, quantity, usdRate);
     this.multiplier = (typeof multiplier !== 'undefined') ? multiplier : null;
   }
 
+  OptionOrderTransaction.prototype = Object.create(OrderTransaction.prototype);
+  OptionOrderTransaction.prototype.constructor = OptionOrderTransaction;
   OptionOrderTransaction.prototype.getTransactionType = function() { return 'OPTION_ORDER'; };
   OptionOrderTransaction.prototype.getMultiplier = function() { return this.multiplier; };
 //})();

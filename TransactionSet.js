@@ -2,6 +2,8 @@
  * Created by Tom on 2017-05-01.
  */
 
+var TransactionType = {'INTEREST': 'INTEREST', 'CARRY_CHARGE': 'CARRY_CHARGE', 'DIVIDEND': 'DIVIDEND', 'ORDERS': 'ORDER'};
+
 /**
  * Object to hold transactions by category
  */
@@ -41,8 +43,17 @@
   /**
    * @returns array of transactions objects of type order
    */
-  TransactionSet.prototype.getOrderTransactions = function() {
-    return this.transactionsList['ORDER'];
+  TransactionSet.prototype.getOrderTransactions = function(security) {
+    if (typeof security === 'undefined')
+      return this.transactionsList[TransactionType.ORDERS];
+    else {
+      var orders = [];
+
+      this.transactionList[TransactionType.ORDERS].forEach(function() {
+        if (security === this.transactionList[TransactionType.ORDERS].getSecurity())
+          orders.push(transactionList[TransactionType.ORDERS]);
+      });
+    }
   };
 
   /**
@@ -56,15 +67,17 @@
    * @param type - string of transaction type (INTEREST, CARRY_CHARGE, DIVIDEND, ORDER, OPTION_ORDER)
    * @returns json object {'ACCOUNT CURRENT', 'SECURITY_ID'} of unqiue indenitifers matching the transaction type specified
    */
-  TransactionSet.prototype.getUniqueSecurityIDs = function (type) {
-    var list = {};
+  TransactionSet.prototype.getUniqueSecurities = function (type) {
+    var list = [], UID;
 
     for (var i = 0; i < this.transactionsList[type].length; i++) {
-      var UID = {'ACCOUNT CURRENCY': this.transactionsList[type][i]['ACCOUNT'],
-                 'SECURITY_ID': this.transactionsList[type][i]['SECURITY_ID-']};
+      UID = null;
+      UID = this.transactionsList[type][i].getSecurity().getAccountCurrency() + "_" + this.transactionsList[type][i].getSecurity().getSecurityID();
 
-      if (!(UID in list.indexOf))
+      if (list.indexOf(UID) === -1)
         list.push(UID);
     }
+
+    return list;
   };
 //})();

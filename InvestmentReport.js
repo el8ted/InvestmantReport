@@ -35,8 +35,19 @@
    *
    */
   InvestmentReport.prototype.getRealizedGainLossReport = function(transaction) {
-    this.getRealizedGainLossOnSecurityID(symbol);
-    return this.transactions['GAIN_LOSS'];
+    var securityIDs = this.transactionsSet.getUniqueSecurities(TransactionType.ORDERS);
+    var gainLossReport = [], gainLossSecurity = [];
+
+    // TODO: add option order transaction
+    for (var securityKey in securityIDs)
+      if (securityIDs.hasOwnProperty(securityKey)) {
+        gainLossSecurity.push(securityIDs[securityKey]);
+        gainLossSecurity.push(this.getRealizedGainLossBySecurity(securityIDs[securityKey]));
+
+        gainLossReport.push(gainLossSecurity);
+      }
+
+    return gainLossReport;
   };
 
   /**
@@ -48,12 +59,11 @@
             'GAIN_LOSS': this.getRealizedGainLossReport()};
   };
 
-
   /**
    *
    */
-  InvestmentReport.prototype.getRealizedGainLossOnSecurityID = function(symbol) {
-    var transactionList = getBuySellTransactions(symbol);
+  InvestmentReport.prototype.getRealizedGainLossBySecurity = function(security) {
+    var transactionList = this.transactionsSet.getOrderTransactions(security);
     var totalQuantity = 0, totalBookValue = 0, avgCostPerQuantity = 0, totalGainLoss = 0;
     var nextDate, date, amount = 0, quantity = 0, gainLoss = 0, fxRate = 0;
 
@@ -87,7 +97,7 @@
         }
       }
 
-      totalBookValue = getUpdatedTotalBookValue(transactionList, totalQuantity, totalBookValue, avgCostPerQuantity, date, quantity, amount, nextDate, gainLoss, j);
+      totalBookValue = this.getUpdatedTotalBookValue(transactionList, totalQuantity, totalBookValue, avgCostPerQuantity, date, quantity, amount, nextDate, gainLoss, j);
       if (totalQuantity != 0)
         avgCostPerQuantity = totalBookValue / totalQuantity;
       else

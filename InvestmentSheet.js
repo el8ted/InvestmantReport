@@ -38,9 +38,9 @@ var loadAllTransactionsFromActiveSheet = function() {
   // Remove empty rows
   for (i = transactionList.length - 1; i >= 0; --i) {
     if ((transactionList[i][TransactionListColumn.TRADE_DATE] === "") && (transactionList[i][TransactionListColumn.ACCOUNT_CURRENCY] === "") &&
-      (transactionList[i][TransactionListColumn.SECURITY_ID] === "") && (transactionList[i][TransactionListColumn.AMOUNT] === "") &&
-      (transactionList[i][TransactionListColumn.QUANTITY] === "") && (transactionList[i][TransactionListColumn.DIVIDEND] === "") &&
-      (transactionList[i][TransactionListColumn.USD_RATE] === ""))
+        (transactionList[i][TransactionListColumn.SECURITY_ID] === "") && (transactionList[i][TransactionListColumn.AMOUNT] === "") &&
+        (transactionList[i][TransactionListColumn.QUANTITY] === "") && (transactionList[i][TransactionListColumn.DIVIDEND] === "") &&
+        (transactionList[i][TransactionListColumn.USD_RATE] === ""))
       transactionList.splice(i, 1);
     else {
       // Set currency based on account description
@@ -62,9 +62,9 @@ var loadAllTransactionsFromActiveSheet = function() {
  * @param transaction
  */
 var addTransaction = function(transaction) {
-  if ((transaction[TransactionListColumn.AMOUNT !== null]) &&
-      (transaction[TransactionListColumn.QUANTITY === null]) &&
-      (transaction[TransactionListColumn.DIVIDEND !== null])) {
+  if ((transaction[TransactionListColumn.AMOUNT] !== "") &&
+      (transaction[TransactionListColumn.QUANTITY] === "") &&
+      (transaction[TransactionListColumn.DIVIDEND])=== "") {
 
     if (transaction[TransactionListColumn.AMOUNT] >= 0)
       report.addTransaction(new InterestTransaction(transaction[TransactionListColumn.ACCOUNT_CURRENCY],
@@ -79,32 +79,32 @@ var addTransaction = function(transaction) {
     return;
   }
 
-  if (transaction[TransactionListColumn.DIVIDEND] !== null)
+  if (transaction[TransactionListColumn.DIVIDEND] !== "")
     report.addTransaction(new DividendTransaction(transaction[TransactionListColumn.ACCOUNT_CURRENCY],
-                                                  transaction[TransactionListColumn.SECURITYID],
-                                                  transaction[TransactionListColumn.TRADE_DATE],
-                                                  transaction[TransactionListColumn.AMOUNT],
-                                                  transaction[TransactionListColumn.QUANTITY],
-                                                  transaction[TransactionListColumn.USD_RATE]));
+                          transaction[TransactionListColumn.SECURITYID],
+                          transaction[TransactionListColumn.TRADE_DATE],
+                          transaction[TransactionListColumn.AMOUNT],
+                          transaction[TransactionListColumn.QUANTITY],
+                          transaction[TransactionListColumn.USD_RATE]));
 
-  if (transaction[TransactionListColumn.QUANTITY] !== null) {
+  if (transaction[TransactionListColumn.QUANTITY] !== "") {
     if ((transaction[TransactionListColumn.SECURITY_ID].slice(5) === 'CALL-') ||
         (transaction[TransactionListColumn.SECURITY_ID].slice(5) === 'PUT-'))
-      // TODO: remove hard coding of multiplier
+    // TODO: remove hard coding of multiplier
       report.addTransaction(new OptionOrderTransaction(transaction[TransactionListColumn.ACCOUNT_CURRENCY],
-                                                       transaction[TransactionListColumn.SECURITYID],
-                                                       transaction[TransactionListColumn.TRADE_DATE],
-                                                       transaction[TransactionListColumn.AMOUNT],
-                                                       transaction[TransactionListColumn.ACCOUNT_CURRENCY],
-                                                       transaction[TransactionListColumn.QUANTITY],
-                                                       transaction[TransactionListColumn.USD_RATE],
-                                                       100));
+                            transaction[TransactionListColumn.SECURITYID],
+                            transaction[TransactionListColumn.TRADE_DATE],
+                            transaction[TransactionListColumn.AMOUNT],
+                            transaction[TransactionListColumn.ACCOUNT_CURRENCY],
+                            transaction[TransactionListColumn.QUANTITY],
+                            transaction[TransactionListColumn.USD_RATE],
+                            100));
     else
       report.addTransaction(new OrderTransaction(transaction[TransactionListColumn.ACCOUNT_CURRENCY],
-                                                 transaction[TransactionListColumn.SECURITYID],
-                                                 transaction[TransactionListColumn.TRADE_DATE],
-                                                 transaction[TransactionListColumn.AMOUNT],
-                                                 transaction[TransactionListColumn.QUANTITY],
-                                                 transaction[TransactionListColumn.USD_RATE]));
+                            transaction[TransactionListColumn.SECURITY_ID],
+                            transaction[TransactionListColumn.TRADE_DATE],
+                            transaction[TransactionListColumn.AMOUNT],
+                            transaction[TransactionListColumn.QUANTITY],
+                            transaction[TransactionListColumn.USD_RATE]));
   }
 };
