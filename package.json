@@ -1,0 +1,11 @@
+{
+  "name": "investment-report",
+  "version": "0.1.0",
+  "description": "Script for Google Sheets to generate a realized gain/loss report",
+  "author": "Tom Hosiawa",
+  "license": "MIT",
+  "devDependencies": {
+    "jquery": "^3.2.1",
+    "requirejs": "^2.3.3"
+  }
+}
