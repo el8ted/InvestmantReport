@@ -7,11 +7,15 @@
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var TransactionSet = require('./TransactionSet.js').TransactionSet;
-  var TransactionType = require('./TransactionSet.js').TransactionType;
+  var InvestmentType = require('./InvestmentType.js').InvestmentType;
 
   module.exports = InvestmentReport;
 }
 
+
+/**
+ * InvestmentReport class
+ */
 function InvestmentReport() {
   this.transactionsSet = new TransactionSet();
 }
@@ -82,7 +86,7 @@ InvestmentReport.prototype.getSummary = function () {
 InvestmentReport.prototype.getRealizedGainLossBySecurity = function (security) {
   var orders = this.transactionsSet.getOrderTransactions(security);
   var totalQuantity = 0, totalBookValue = 0, avgCostPerQuantity = 0, totalGainLoss = 0;
-  var nextDate, date, amount = 0, quantity = 0, gainLoss = 0, usdRate = 0;
+  var nextDate, date, amount = 0, quantity = 0, gainLoss = 0, usdRate = null;
 
   for (var j = 0; j < orders.length; j++) {
     if (j + 1 < orders.length)
@@ -93,10 +97,10 @@ InvestmentReport.prototype.getRealizedGainLossBySecurity = function (security) {
     date = orders[j].getTradeDate();
     amount = Number(orders[j].getAmount());
     quantity = Number(orders[j].getQuantity());
-    usdRate = Number(orders[j].getUSDRate());
+    usdRate = (orders[j].getUSDRate()) ? Number(orders[j].getUSDRate()): null;
 
     // Convert USD values to CAD
-    if (usdRate !== '')
+    if (usdRate !== null)
       amount = amount * usdRate;
 
     // Catch rounding errors
@@ -137,9 +141,10 @@ InvestmentReport.prototype.getRealizedGainLossBySecurity = function (security) {
  * @return {*}
  */
 InvestmentReport.prototype.getUpdatedTotalBookValue = function (orders, totalQuantity, totalBookValue, avgCostPerQuantity, date, quantity, amount, nextDate, gainLoss, n) {
-  // Expiring contract
+  // Expiring contract or transaction closes entire position
   if (quantity !== 0 && totalQuantity === 0)
     totalBookValue = 0;
+  // Buy action
   else if (quantity > 0 && totalQuantity >= 0)
     totalBookValue = totalBookValue - amount;
   // Cover transaction

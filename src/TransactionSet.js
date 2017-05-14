@@ -4,7 +4,14 @@
 "use strict";
 
 
-var TransactionType = {'INTEREST': 'INTEREST', 'CARRY_CHARGE': 'CARRY_CHARGE', 'DIVIDEND': 'DIVIDEND', 'ORDERS': 'ORDER'};
+global.RUN_ON_NODE = true;
+if (global.RUN_ON_NODE) {
+  var InvestmentTypeModule = require('./InvestmentType.js');
+  var InvestmentType = InvestmentTypeModule.InvestmentType;
+
+  module.exports.TransactionSet = TransactionSet;
+}
+
 
 /**
  * Object to hold transactions by category
@@ -18,7 +25,7 @@ function TransactionSet() {
  * @param transaction - Transaction object to add to list
  */
 TransactionSet.prototype.addTransaction = function(transaction) {
-  this.transactionsList[transaction.getTransactionType()].push(transaction);
+  this.transactionsList[transaction.getInvestmentType()].push(transaction);
 };
 
 
@@ -26,7 +33,7 @@ TransactionSet.prototype.addTransaction = function(transaction) {
  * @returns array of transactions objects of type dividend
  */
 TransactionSet.prototype.getDividendTransactions = function() {
-  return this.transactionsList['DIVIDEND'];
+  return this.transactionsList[InvestmentType.DIVIDEND];
 };
 
 
@@ -34,7 +41,7 @@ TransactionSet.prototype.getDividendTransactions = function() {
  * @returns array of transactions objects of type interest
  */
 TransactionSet.prototype.getInterestTransactions = function() {
-  return this.transactionsList['INTEREST'];
+  return this.transactionsList[InvestmentType.INTEREST];
 };
 
 
@@ -42,7 +49,7 @@ TransactionSet.prototype.getInterestTransactions = function() {
  *@returns array of transactions objects of type carry charge
  */
 TransactionSet.prototype.getCarryChargeTransactions = function() {
-  return this.transactionsList['CARRY_CHARGE'];
+  return this.transactionsList[InvestmentType.CARRY_CHARGE];
 };
 
 
@@ -53,11 +60,11 @@ TransactionSet.prototype.getOrderTransactions = function(security) {
   var orders = [];
 
   if (typeof security === 'undefined')
-    return this.transactionsList[TransactionType.ORDERS];
+    return this.transactionsList[InvestmentType.ORDERS];
   else {
-    for (var i = 0; i < this.transactionsList[TransactionType.ORDERS].length; i++) {
-      if (security === this.transactionsList[TransactionType.ORDERS][i].getSecurity().getUID())
-        orders.push(this.transactionsList[TransactionType.ORDERS][i]);
+    for (var i = 0; i < this.transactionsList[InvestmentType.ORDERS].length; i++) {
+      if (security === this.transactionsList[InvestmentType.ORDERS][i].getSecurity().getUID())
+        orders.push(this.transactionsList[InvestmentType.ORDERS][i]);
     };
   }
 
@@ -69,7 +76,7 @@ TransactionSet.prototype.getOrderTransactions = function(security) {
  * @returns array of transactions objects of type option order
  */
 TransactionSet.prototype.getOptionOrderTransaction = function(transaction) {
-  return this.transactionsList[TransactionType.OPTION_ORDER];
+  return this.transactionsList[InvestmentType.OPTION_ORDER];
 };
 
 
@@ -90,7 +97,3 @@ TransactionSet.prototype.getUniqueSecurities = function (type) {
 
   return list;
 };
-
-
-module.exports.TransactionType = TransactionType;
-module.exports.TransactionSet = TransactionSet;

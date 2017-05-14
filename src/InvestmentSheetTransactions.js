@@ -13,14 +13,14 @@ if (global.RUN_ON_NODE) {
 
   var InvestmentReport = require('./InvestmentReport.js');
   
-  var Transaction = require('./Transaction.js');
-  var Security = Transaction.Security;
-  var BaseTransaction = Transaction.BaseTransaction;
-  var DividendTransaction = Transaction.DividendTransaction;
-  var InterestTransaction = Transaction.InterestTransaction;
-  var CarryChargeTransaction = Transaction.CarryChargeTransaction;
-  var OrderTransaction = Transaction.OrderTransaction;
-  var OptionOrderTransaction = Transaction.OptionOrderTransaction;
+  var TransactionModule = require('./Transaction.js');
+  var Security = TransactionModule.Security;
+  var BaseTransaction = TransactionModule.BaseTransaction;
+  var DividendTransaction = TransactionModule.DividendTransaction;
+  var InterestTransaction = TransactionModule.InterestTransaction;
+  var CarryChargeTransaction = TransactionModule.CarryChargeTransaction;
+  var OrderTransaction = TransactionModule.OrderTransaction;
+  var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
 
   function node_init() {
     main();

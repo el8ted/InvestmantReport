@@ -10,8 +10,8 @@ if (global.RUN_ON_NODE) {
   module.exports.ActiveSpreadsheet = ActiveSpreadsheet;
   module.exports.ActiveSheet = ActiveSheet;
   module.exports.ArrayLib = ArrayLib;
-  module.exports.SpreadsheetApp = SpreadsheetApp;
   module.exports.Range = Range;
+  module.exports.SpreadsheetApp = SpreadsheetApp;
 }
 
 /**
