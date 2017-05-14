@@ -2,8 +2,15 @@
  * Created by Tom on 2017-05-01.
  */
 "use strict";
-const TransactionSet = require('./TransactionSet.js');
 
+
+global.RUN_ON_NODE = true;
+if (global.RUN_ON_NODE) {
+  var TransactionSet = require('./TransactionSet.js').TransactionSet;
+  var TransactionType = require('./TransactionSet.js').TransactionType;
+
+  module.exports = InvestmentReport;
+}
 
 function InvestmentReport() {
   this.transactionsSet = new TransactionSet();
@@ -200,5 +207,3 @@ function isBoughtBackWithin30Days(orders, fromIndex) {
 
   return false;
 }
-
-module.exports = InvestmentReport;

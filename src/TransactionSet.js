@@ -92,4 +92,5 @@ TransactionSet.prototype.getUniqueSecurities = function (type) {
 };
 
 
-module.exports = TransactionSet;
+module.exports.TransactionType = TransactionType;
+module.exports.TransactionSet = TransactionSet;

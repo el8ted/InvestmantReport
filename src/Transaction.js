@@ -3,6 +3,18 @@
  */
 "use strict";
 
+
+global.RUN_ON_NODE = true;
+if (global.RUN_ON_NODE) {
+  module.exports.Security = Security;
+  module.exports.BaseTransaction = BaseTransaction;
+  module.exports.DividendTransaction = DividendTransaction;
+  module.exports.InterestTransaction = InterestTransaction;
+  module.exports.CarryChargeTransaction = CarryChargeTransaction;
+  module.exports.OrderTransaction = OrderTransaction;
+  module.exports.OptionOrderTransaction = OptionOrderTransaction;
+}
+
 /**
  * Security object
  */

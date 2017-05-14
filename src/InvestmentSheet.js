@@ -3,10 +3,31 @@
  * Class to interact with getting data from active sheet and put report in the same active sheet
  */
 "use strict";
-global.RUN_ON_NODE = true;
 
-if (global.RUN_ON_NODE)
+
+global.RUN_ON_NODE = true;
+if (global.RUN_ON_NODE) {
+  var SpreadSheetAppModule = require('./mock_google_service/SpreadsheetApp.js');
+  var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
+  var ArrayLib = new SpreadSheetAppModule.ArrayLib();
+
   var InvestmentReport = require('./InvestmentReport.js');
+  
+  var Transaction = require('./Transaction.js');
+  var Security = Transaction.Security;
+  var BaseTransaction = Transaction.BaseTransaction;
+  var DividendTransaction = Transaction.DividendTransaction;
+  var InterestTransaction = Transaction.InterestTransaction;
+  var CarryChargeTransaction = Transaction.CarryChargeTransaction;
+  var OrderTransaction = Transaction.OrderTransaction;
+  var OptionOrderTransaction = Transaction.OptionOrderTransaction;
+
+  function node_init() {
+    main();
+  }
+  
+  module.exports = node_init;
+}
 
 var SheetConfig = {
   DataRange: 'A:H',
@@ -17,36 +38,36 @@ var SheetConfig = {
 /**
  * @param transaction
  */
-var addTransaction = function (transaction) {
-  if ((transaction[sheetTransactionsColumn.AMOUNT] !== '') &&  (transaction[sheetTransactionsColumn.QUANTITY] === '') &&
-      (transaction[sheetTransactionsColumn.DIVIDEND]) === '') {
+var addTransaction = function (report, transaction) {
+  if ((transaction[SheetConfig.DateColumns.AMOUNT] !== '') &&  (transaction[SheetConfig.DateColumns.QUANTITY] === '') &&
+      (transaction[SheetConfig.DateColumns.DIVIDEND]) === '') {
 
-    if (transaction[sheetTransactionsColumn.AMOUNT] >= 0)
-      report.addTransaction(new InterestTransaction(transaction[sheetTransactionsColumn.ACCOUNT], transaction[sheetTransactionsColumn.TRADE_DATE],
-                                                    transaction[sheetTransactionsColumn.AMOUNT], transaction[sheetTransactionsColumn.USD_RATE]));
+    if (transaction[SheetConfig.DateColumns.AMOUNT] >= 0)
+      report.addTransaction(new InterestTransaction(transaction[SheetConfig.DateColumns.ACCOUNT], transaction[SheetConfig.DateColumns.TRADE_DATE],
+                                                    transaction[SheetConfig.DateColumns.AMOUNT], transaction[SheetConfig.DateColumns.USD_RATE]));
     else
-      report.addTransaction(new CarryChargeTransaction(transaction[sheetTransactionsColumn.ACCOUNT], transaction[sheetTransactionsColumn.TRADE_DATE],
-                                                       transaction[sheetTransactionsColumn.AMOUNT], transaction[sheetTransactionsColumn.USD_RATE]));
+      report.addTransaction(new CarryChargeTransaction(transaction[SheetConfig.DateColumns.ACCOUNT], transaction[SheetConfig.DateColumns.TRADE_DATE],
+                                                       transaction[SheetConfig.DateColumns.AMOUNT], transaction[SheetConfig.DateColumns.USD_RATE]));
     return;
   }
 
-  if (transaction[sheetTransactionsColumn.DIVIDEND] !== '')
-    report.addTransaction(new DividendTransaction(transaction[sheetTransactionsColumn.ACCOUNT], transaction[sheetTransactionsColumn.SECURITYID],
-                                                  transaction[sheetTransactionsColumn.TRADE_DATE], transaction[sheetTransactionsColumn.AMOUNT],
-                                                  transaction[sheetTransactionsColumn.QUANTITY], transaction[sheetTransactionsColumn.USD_RATE]));
+  if (transaction[SheetConfig.DateColumns.DIVIDEND] !== '')
+    report.addTransaction(new DividendTransaction(transaction[SheetConfig.DateColumns.ACCOUNT], transaction[SheetConfig.DateColumns.SECURITYID],
+                                                  transaction[SheetConfig.DateColumns.TRADE_DATE], transaction[SheetConfig.DateColumns.AMOUNT],
+                                                  transaction[SheetConfig.DateColumns.QUANTITY], transaction[SheetConfig.DateColumns.USD_RATE]));
 
-  if (transaction[sheetTransactionsColumn.QUANTITY] !== '') {
-    if ((transaction[sheetTransactionsColumn.SECURITY_ID].slice(5) === 'CALL-') ||
-        (transaction[sheetTransactionsColumn.SECURITY_ID].slice(5) === 'PUT-'))
+  if (transaction[SheetConfig.DateColumns.QUANTITY] !== '') {
+    if ((transaction[SheetConfig.DateColumns.SECURITY_ID].slice(5) === 'CALL-') ||
+        (transaction[SheetConfig.DateColumns.SECURITY_ID].slice(5) === 'PUT-'))
       // TODO: remove hard coding of multiplier
-      report.addTransaction(new OptionOrderTransaction(transaction[sheetTransactionsColumn.ACCOUNT], transaction[sheetTransactionsColumn.SECURITYID],
-                                                       transaction[sheetTransactionsColumn.TRADE_DATE], transaction[sheetTransactionsColumn.AMOUNT],
-                                                       transaction[sheetTransactionsColumn.ACCOUNT], transaction[sheetTransactionsColumn.QUANTITY],
-                                                       transaction[sheetTransactionsColumn.USD_RATE], 100));
+      report.addTransaction(new OptionOrderTransaction(transaction[SheetConfig.DateColumns.ACCOUNT], transaction[SheetConfig.DateColumns.SECURITYID],
+                                                       transaction[SheetConfig.DateColumns.TRADE_DATE], transaction[SheetConfig.DateColumns.AMOUNT],
+                                                       transaction[SheetConfig.DateColumns.ACCOUNT], transaction[SheetConfig.DateColumns.QUANTITY],
+                                                       transaction[SheetConfig.DateColumns.USD_RATE], 100));
     else
-      report.addTransaction(new OrderTransaction(transaction[sheetTransactionsColumn.ACCOUNT], transaction[sheetTransactionsColumn.SECURITY_ID],
-                                                 transaction[sheetTransactionsColumn.TRADE_DATE], transaction[sheetTransactionsColumn.AMOUNT],
-                                                 transaction[sheetTransactionsColumn.QUANTITY], transaction[sheetTransactionsColumn.USD_RATE]));
+      report.addTransaction(new OrderTransaction(transaction[SheetConfig.DateColumns.ACCOUNT], transaction[SheetConfig.DateColumns.SECURITY_ID],
+                                                 transaction[SheetConfig.DateColumns.TRADE_DATE], transaction[SheetConfig.DateColumns.AMOUNT],
+                                                 transaction[SheetConfig.DateColumns.QUANTITY], transaction[SheetConfig.DateColumns.USD_RATE]));
   }
 };
 
@@ -56,33 +77,33 @@ var addTransaction = function (transaction) {
  */
 var loadAllTransactionsFromActiveSheet = function () {
   SpreadsheetApp.setActiveSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName("2011 New")); //TODO: For debug mode only
-  var sheetTransactions = SpreadsheetApp.getActiveSheet().getRange(TransactionRange).getValues();
+  var sheetTransactions = SpreadsheetApp.getActiveSheet().getRange(SheetConfig.DataRange).getValues();
 
   // Remove header row
   sheetTransactions.splice(0, 1);
 
-  for (i = sheetTransactions.length - 1; i >= 0; --i) {
-    if ((sheetTransactions[i][sheetTransactionsColumn.TRADE_DATE] === '') && (sheetTransactions[i][sheetTransactionsColumn.ACCOUNT] === '') &&
-        (sheetTransactions[i][sheetTransactionsColumn.SECURITY_ID] === '') && (sheetTransactions[i][sheetTransactionsColumn.AMOUNT] === '') &&
-        (sheetTransactions[i][sheetTransactionsColumn.QUANTITY] === '') && (sheetTransactions[i][sheetTransactionsColumn.DIVIDEND] === '') &&
-        (sheetTransactions[i][sheetTransactionsColumn.USD_RATE] === '')) {
+  for (var i = sheetTransactions.length - 1; i >= 0; --i) {
+    if ((sheetTransactions[i][SheetConfig.DateColumns.TRADE_DATE] === '') && (sheetTransactions[i][SheetConfig.DateColumns.ACCOUNT] === '') &&
+        (sheetTransactions[i][SheetConfig.DateColumns.SECURITY_ID] === '') && (sheetTransactions[i][SheetConfig.DateColumns.AMOUNT] === '') &&
+        (sheetTransactions[i][SheetConfig.DateColumns.QUANTITY] === '') && (sheetTransactions[i][SheetConfig.DateColumns.DIVIDEND] === '') &&
+        (sheetTransactions[i][SheetConfig.DateColumns.USD_RATE] === '')) {
       // Remove empty rows
       sheetTransactions.splice(i, 1);
     }
     else {
       // Set currency based on account description
-      var account = sheetTransactions[i][sheetTransactionsColumn.ACCOUNT].toString();
+      var account = sheetTransactions[i][SheetConfig.DateColumns.ACCOUNT].toString();
 
       // Account currency column must end with ' USD' or ' US'. Otherwise, it's assumed to be CAD
       if ((account !== null) &&
           ((account.substring(account.length - 4, account.length) === ' USD') || (account.substring(account.length - 3, account.length) === ' US')))
-        sheetTransactions[i][sheetTransactionsColumn.ACCOUNT] = 'USD';
+        sheetTransactions[i][SheetConfig.DateColumns.ACCOUNT] = 'USD';
       else
-        sheetTransactions[i][sheetTransactionsColumn.ACCOUNT] = 'CAD';
+        sheetTransactions[i][SheetConfig.DateColumns.ACCOUNT] = 'CAD';
     }
   }
 
-  sheetTransactions = ArrayLib.sort(sheetTransactions, sheetTransactionsColumn.TRADE_DATE, true);
+  sheetTransactions = ArrayLib.sort(sheetTransactions, SheetConfig.DateColumns.TRADE_DATE, true);
   return sheetTransactions;
 };
 
@@ -95,7 +116,7 @@ function main() {
   var sheetTransactions = loadAllTransactionsFromActiveSheet();
 
   for (var k = 0; k < sheetTransactions.length; k++)
-    addTransaction(sheetTransactions[k]);
+    addTransaction(report, sheetTransactions[k]);
 
   report.getSummary();
 }
