@@ -39,16 +39,19 @@ var SheetConfig = {
  * @param transaction
  */
 var addTransaction = function (report, transaction) {
-  if ((transaction[SheetConfig.DateColumns.AMOUNT] !== '') &&  (transaction[SheetConfig.DateColumns.QUANTITY] === '') &&
+  if ((transaction[SheetConfig.DateColumns.AMOUNT] !== '') &&
+      (transaction[SheetConfig.DateColumns.QUANTITY] === '') &&
       (transaction[SheetConfig.DateColumns.DIVIDEND]) === '') {
 
     if (transaction[SheetConfig.DateColumns.AMOUNT] >= 0)
       report.addTransaction(new InterestTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
+                                                    transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                     transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                     transaction[SheetConfig.DateColumns.AMOUNT],
                                                     transaction[SheetConfig.DateColumns.USD_RATE]));
     else
       report.addTransaction(new CarryChargeTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
+                                                       transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                        transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                        transaction[SheetConfig.DateColumns.AMOUNT],
                                                        transaction[SheetConfig.DateColumns.USD_RATE]));
@@ -57,31 +60,30 @@ var addTransaction = function (report, transaction) {
 
   if (transaction[SheetConfig.DateColumns.DIVIDEND] !== '')
     report.addTransaction(new DividendTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
-                                                  transaction[SheetConfig.DateColumns.SECURITYID],
+                                                  transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                   transaction[SheetConfig.DateColumns.TRADE_DATE],
-                                                  transaction[SheetConfig.DateColumns.AMOUNT],
-                                                  transaction[SheetConfig.DateColumns.QUANTITY],
-                                                  transaction[SheetConfig.DateColumns.USD_RATE]));
+                                                  transaction[SheetConfig.DateColumns.DIVIDEND],
+                                                  transaction[SheetConfig.DateColumns.USD_RATE],
+                                                  transaction[SheetConfig.DateColumns.QUANTITY]));
 
   if (transaction[SheetConfig.DateColumns.QUANTITY] !== '') {
     if ((transaction[SheetConfig.DateColumns.SECURITY_ID].slice(5) === 'CALL-') ||
         (transaction[SheetConfig.DateColumns.SECURITY_ID].slice(5) === 'PUT-'))
       // TODO: remove hard coding of multiplier
       report.addTransaction(new OptionOrderTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
-                                                       transaction[SheetConfig.DateColumns.SECURITYID],
+                                                       transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                        transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                        transaction[SheetConfig.DateColumns.AMOUNT],
-                                                       transaction[SheetConfig.DateColumns.ACCOUNT],
-                                                       transaction[SheetConfig.DateColumns.QUANTITY],
                                                        transaction[SheetConfig.DateColumns.USD_RATE],
+                                                       transaction[SheetConfig.DateColumns.QUANTITY],
                                                        100));
     else
       report.addTransaction(new OrderTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
                                                  transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                  transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                  transaction[SheetConfig.DateColumns.AMOUNT],
-                                                 transaction[SheetConfig.DateColumns.QUANTITY],
-                                                 transaction[SheetConfig.DateColumns.USD_RATE]));
+                                                 transaction[SheetConfig.DateColumns.USD_RATE],
+                                                 transaction[SheetConfig.DateColumns.QUANTITY]));
   }
 };
 
@@ -136,5 +138,5 @@ function main() {
   for (var k = 0; k < sheetTransactions.length; k++)
     addTransaction(report, sheetTransactions[k]);
 
-  report.getSummary();
+  var temp = report.getSummary();
 }

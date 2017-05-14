@@ -50,10 +50,10 @@ BaseTransaction.prototype.getUSDRate = function() { return this.usdRate; };
  * @param quantity - optional
  * @param usdRate - optional
  */
-function DividendTransaction(accountCurrency, symbol, tradeDate, amount, quantity, usdRate) {
+function DividendTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity) {
   if (typeof amount !== 'undefined') {
     if (amount >= 0) {
-      amount = 0;
+      amount = amount;
       this.amountWithheld = null;
     } else {
       this.amountWithheld = amount;
@@ -61,7 +61,7 @@ function DividendTransaction(accountCurrency, symbol, tradeDate, amount, quantit
     }
   }
 
-  BaseTransaction.call(this, accountCurrency, symbol, tradeDate, amount, usdRate);
+  BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
   this.quantity = (typeof quantity !== 'undefined') ?  quantity : null;
 }
 
@@ -75,8 +75,8 @@ DividendTransaction.prototype.getQuantity = function() { return this.quantity; }
 /**
  * @param usdRate - optional
  */
-function InterestTransaction(accountCurrency, tradeDate, amount, usdRate) {
-  BaseTransaction.call(this, accountCurrency, tradeDate, amount, usdRate);
+function InterestTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
+  BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
 }
 
 InterestTransaction.prototype = Object.create(BaseTransaction.prototype);
@@ -87,8 +87,8 @@ InterestTransaction.prototype.getTransactionType = function() { return 'INTEREST
 /**
  * @param usdRate - optional
  */
-function CarryChargeTransaction(accountCurrency, tradeDate, amount, usdRate) {
-  BaseTransaction.call(this, accountCurrency, tradeDate, amount, usdRate);
+function CarryChargeTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
+  BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
 }
 
 CarryChargeTransaction.prototype = Object.create(BaseTransaction.prototype);
@@ -101,8 +101,8 @@ CarryChargeTransaction.prototype.getTransactionType = function() { return 'CARRY
  * @param amount - optional. net amount of order (after commission)
  * @param usdRate - optional
  */
-function OrderTransaction(accountCurrency, symbol, tradeDate, amount, quantity, usdRate) {
-  BaseTransaction.call(this, accountCurrency, symbol, tradeDate, amount, usdRate);
+function OrderTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity) {
+  BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
   this.quantity = (typeof quantity !== 'undefined') ?  quantity : null;
 }
 
@@ -117,8 +117,8 @@ OrderTransaction.prototype.getQuantity = function() { return this.quantity; };
  * @param amount - optional. net amount of order (after commission)
  * @param usdRate - optional
  */
-function OptionOrderTransaction(accountCurrency, symbol, tradeDate, amount, quantity, usdRate, multiplier) {
-  OrderTransaction.call(this, accountCurrency, symbol, tradeDate, amount, quantity, usdRate);
+function OptionOrderTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity, multiplier) {
+  OrderTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate, quantity);
   this.multiplier = (typeof multiplier !== 'undefined') ? multiplier : null;
 }
 
