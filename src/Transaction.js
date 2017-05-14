@@ -15,10 +15,10 @@ Security.prototype.getAccountCurrency = function() { return this.accountCurrency
 Security.prototype.getSecurityID = function() { return this.securityID; };
 Security.prototype.getUID = function() { return this.accountCurrency + "_" + this.securityID; };
 
+
 /**
  * Base transection object
  */
-//var BaseTransaction = (function() {
 function BaseTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
   this.security = new Security(accountCurrency, securityID);
   this.tradeDate = tradeDate;
@@ -31,10 +31,8 @@ BaseTransaction.prototype.getSecurity = function() { return this.security; };
 BaseTransaction.prototype.getTradeDate = function() { return this.tradeDate; };
 BaseTransaction.prototype.getAmount = function() { return this.amount; };
 BaseTransaction.prototype.getUSDRate = function() { return this.usdRate; };
-//})();
 
 
-//var DividendTransaction = (function() {
 /**
  * @param amountWithheld - optional
  * @param quantity - optional
@@ -60,10 +58,8 @@ DividendTransaction.prototype.constructor = DividendTransaction;
 DividendTransaction.prototype.getTransactionType = function() { return 'DIVIDEND'; };
 DividendTransaction.prototype.getAmountWithheld = function() { return this.amountWithheld; };
 DividendTransaction.prototype.getQuantity = function() { return this.quantity; };
-//})();
 
 
-//var InterestTransaction = (function() {
 /**
  * @param usdRate - optional
  */
@@ -74,10 +70,8 @@ function InterestTransaction(accountCurrency, tradeDate, amount, usdRate) {
 InterestTransaction.prototype = Object.create(BaseTransaction.prototype);
 InterestTransaction.prototype.constructor = InterestTransaction;
 InterestTransaction.prototype.getTransactionType = function() { return 'INTEREST'; };
-//})();
 
 
-//var CarryChargeTransaction = (function() {
 /**
  * @param usdRate - optional
  */
@@ -88,10 +82,8 @@ function CarryChargeTransaction(accountCurrency, tradeDate, amount, usdRate) {
 CarryChargeTransaction.prototype = Object.create(BaseTransaction.prototype);
 CarryChargeTransaction.prototype.constructor = CarryChargeTransaction;
 CarryChargeTransaction.prototype.getTransactionType = function() { return 'CARRY_CHARGE'; };
-//})();
 
 
-//var OrderTransaction = (function() {
 /**
  * TODO: add support for commission, exchange traded debentures
  * @param amount - optional. net amount of order (after commission)
@@ -106,10 +98,8 @@ OrderTransaction.prototype = Object.create(BaseTransaction.prototype);
 OrderTransaction.prototype.constructor = OrderTransaction;
 OrderTransaction.prototype.getTransactionType = function() { return 'ORDER'; };
 OrderTransaction.prototype.getQuantity = function() { return this.quantity; };
-//})();
 
 
-//var OptionOrderTransaction = (function() {
 /**
  * TODO: add commission support
  * @param amount - optional. net amount of order (after commission)
@@ -124,4 +114,3 @@ OptionOrderTransaction.prototype = Object.create(OrderTransaction.prototype);
 OptionOrderTransaction.prototype.constructor = OptionOrderTransaction;
 OptionOrderTransaction.prototype.getTransactionType = function() { return 'OPTION_ORDER'; };
 OptionOrderTransaction.prototype.getMultiplier = function() { return this.multiplier; };
-//})();
