@@ -5,13 +5,14 @@
 "use strict";
 
 
+// Configuration to run on node with mock data
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var SpreadSheetAppModule = require('./mock_google_service/SpreadsheetApp.js');
   var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
   var ArrayLib = new SpreadSheetAppModule.ArrayLib();
 
-  var InvestmentReport = require('./InvestmentReport.js');
+  var InvestmentsProcessor = require('./InvestmentsProcessor.js');
   
   var TransactionModule = require('./Transaction.js');
   var Security = TransactionModule.Security;
@@ -132,7 +133,7 @@ var loadAllTransactionsFromActiveSheet = function () {
  * Main app function
  */
 function main() {
-  var report = new InvestmentReport();
+  var report = new InvestmentsProcessor();
   var sheetTransactions = loadAllTransactionsFromActiveSheet();
 
   for (var k = 0; k < sheetTransactions.length; k++)

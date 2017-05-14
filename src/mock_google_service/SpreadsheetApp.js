@@ -5,6 +5,7 @@
 "use strict";
 
 
+// Configuration to run on node with mock data
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   module.exports.ActiveSpreadsheet = ActiveSpreadsheet;

@@ -4,6 +4,7 @@
 "use strict";
 
 
+// Configuration to run on node with mock data
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var TransactionSet = require('./TransactionSet.js').TransactionSet;
@@ -17,6 +18,7 @@ if (global.RUN_ON_NODE) {
  * InvestmentReport class
  */
 function InvestmentReport() {
+  
   this.transactionsSet = new TransactionSet();
 }
 
@@ -49,7 +51,7 @@ InvestmentReport.prototype.getInterestReport = function () {
  * @return {Array}
  */
 InvestmentReport.prototype.getRealizedGainLossReport = function () {
-  var securityIDs = this.transactionsSet.getUniqueSecurities(TransactionType.ORDERS);
+  var securityIDs = this.transactionsSet.getUniqueSecurities(InvestmentType.ORDERS);
   var securityKey;
   var gainLossReport = [], gainLossSecurity = [];
 

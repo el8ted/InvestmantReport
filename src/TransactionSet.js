@@ -4,10 +4,10 @@
 "use strict";
 
 
+// Configuration to run on node with mock data
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
-  var InvestmentTypeModule = require('./InvestmentType.js');
-  var InvestmentType = InvestmentTypeModule.InvestmentType;
+  var InvestmentType = require('./InvestmentType.js').InvestmentType;
 
   module.exports.TransactionSet = TransactionSet;
 }
