@@ -10,14 +10,14 @@ if (global.RUN_ON_NODE) {
   var TransactionSet = require('./TransactionSet.js').TransactionSet;
   var InvestmentType = require('./InvestmentType.js').InvestmentType;
 
-  module.exports = InvestmentReport;
+  module.exports = InvestmentsProcessor;
 }
 
 
 /**
- * InvestmentReport class
+ * InvestmentsProcessor class
  */
-function InvestmentReport() {
+function InvestmentsProcessor() {
   
   this.transactionsSet = new TransactionSet();
 }
@@ -26,7 +26,7 @@ function InvestmentReport() {
 /**
  * @param transaction
  */
-InvestmentReport.prototype.addTransaction = function (transaction) {
+InvestmentsProcessor.prototype.addTransaction = function (transaction) {
   this.transactionsSet.addTransaction(transaction);
 };
 
@@ -34,7 +34,7 @@ InvestmentReport.prototype.addTransaction = function (transaction) {
 /**
  * @return {array}
  */
-InvestmentReport.prototype.getCarryChargesReport = function () {
+InvestmentsProcessor.prototype.getCarryChargeSecurities = function () {
   return this.transactionsSet.getCarryChargeTransactions();
 };
 
@@ -42,7 +42,7 @@ InvestmentReport.prototype.getCarryChargesReport = function () {
 /**
  * @return {array}
  */
-InvestmentReport.prototype.getInterestReport = function () {
+InvestmentsProcessor.prototype.getInterestSecurities = function () {
   return this.transactionsSet.getInterestTransactions();
 };
 
@@ -50,7 +50,7 @@ InvestmentReport.prototype.getInterestReport = function () {
 /**
  * @return {Array}
  */
-InvestmentReport.prototype.getRealizedGainLossReport = function () {
+InvestmentsProcessor.prototype.getRealizedGainLossSecurities = function () {
   var securityIDs = this.transactionsSet.getUniqueSecurities(InvestmentType.ORDERS);
   var securityKey;
   var gainLossReport = [], gainLossSecurity = [];
@@ -70,22 +70,10 @@ InvestmentReport.prototype.getRealizedGainLossReport = function () {
 
 
 /**
- * @return {{INTEREST: array, CARRY_CHARGE: array, GAIN_LOSS: Array}}
- */
-InvestmentReport.prototype.getSummary = function () {
-  return {
-    'INTEREST': this.getInterestReport(),
-    'CARRY_CHARGE': this.getCarryChargesReport(),
-    'GAIN_LOSS': this.getRealizedGainLossReport()
-  };
-};
-
-
-/**
  * @param security
  * @return {[*,*,*]}
  */
-InvestmentReport.prototype.getRealizedGainLossBySecurity = function (security) {
+InvestmentsProcessor.prototype.getRealizedGainLossBySecurity = function (security) {
   var orders = this.transactionsSet.getOrderTransactions(security);
   var totalQuantity = 0, totalBookValue = 0, avgCostPerQuantity = 0, totalGainLoss = 0;
   var nextDate, date, amount = 0, quantity = 0, gainLoss = 0, usdRate = null;
@@ -142,7 +130,7 @@ InvestmentReport.prototype.getRealizedGainLossBySecurity = function (security) {
  * @param n
  * @return {*}
  */
-InvestmentReport.prototype.getUpdatedTotalBookValue = function (orders, totalQuantity, totalBookValue, avgCostPerQuantity, date, quantity, amount, nextDate, gainLoss, n) {
+InvestmentsProcessor.prototype.getUpdatedTotalBookValue = function (orders, totalQuantity, totalBookValue, avgCostPerQuantity, date, quantity, amount, nextDate, gainLoss, n) {
   // Expiring contract or transaction closes entire position
   if (quantity !== 0 && totalQuantity === 0)
     totalBookValue = 0;

@@ -12,8 +12,6 @@ if (global.RUN_ON_NODE) {
   var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
   var ArrayLib = new SpreadSheetAppModule.ArrayLib();
 
-  var InvestmentsProcessor = require('./InvestmentsProcessor.js');
-  
   var TransactionModule = require('./Transaction.js');
   var Security = TransactionModule.Security;
   var BaseTransaction = TransactionModule.BaseTransaction;
@@ -23,6 +21,9 @@ if (global.RUN_ON_NODE) {
   var OrderTransaction = TransactionModule.OrderTransaction;
   var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
 
+  var InvestmentsProcessor = require('./InvestmentsProcessor.js');
+  var InvestmentsReport = require('./InvestmentsReport.js');
+  
   function node_init() {
     main();
   }
@@ -133,11 +134,13 @@ var loadAllTransactionsFromActiveSheet = function () {
  * Main app function
  */
 function main() {
-  var report = new InvestmentsProcessor();
+  var investmentsProcessor = new InvestmentsProcessor();
+  var investmentsReport = new InvestmentsReport();
+
   var sheetTransactions = loadAllTransactionsFromActiveSheet();
 
   for (var k = 0; k < sheetTransactions.length; k++)
-    addTransaction(report, sheetTransactions[k]);
+    addTransaction(investmentsProcessor, sheetTransactions[k]);
 
-  var temp = report.getSummary();
+  investmentsReport.getReport(investmentsProcessor);
 }

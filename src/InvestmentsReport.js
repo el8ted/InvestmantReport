@@ -6,10 +6,12 @@
 
 
 // Configuration to run on node with mock data
-gobal.RUN_ON_NODE = true;
+global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var Security = require('./Transaction.js').Security;
   var InvestmentType = require('./InvestmentType.js').InvestmentType;
+
+  module.exports = InvestmentsReport;
 }
 
 
@@ -22,26 +24,43 @@ var SheetConfig = {
 /**
  * Report class 
  */
-function InvestmentRepoort(accountCurrency, securityID) {
+function InvestmentsReport(accountCurrency, securityID) {
   this.reportList = {'CARRY_CHARGE': [], 'DIVIDEND': [], 'INTEREST': [], 'GAIN_LOSS': [] };
 }
 
 
-Security.prototype.addCarryChargeSecurity = function(security, amount) {
+InvestmentsReport.prototype.addCarryChargeSecurity = function(security, amount) {
   return this.reportList[InvestmentType.CARRY_CHARGE] = { security, amount};
 }
 
 
-Security.prototype.addDividendSecurity = function(security, amount) {
-  return tthis.reportList[InvestmentType.DIVIDEND] = { security, amount};
+InvestmentsReport.prototype.addDividendSecurity = function(security, amount) {
+  return this.reportList[InvestmentType.DIVIDEND] = { security, amount};
 }
 
 
-Security.prototype.addInterestSecurity = function(security, amount) {
+InvestmentsReport.prototype.addGainLossSecurity = function(security, amount, quantity, ACB) {
+  return this.reportList[InvestmentType.GAIN_LOSS] = { security, amount, quantity, ACB };
+}
+
+
+InvestmentsReport.prototype.addInterestSecurity = function(security, amount) {
   return this.reportList[InvestmentType.INTEREST] = { security, amount};
 }
 
 
-Security.prototype.addGainLossSecurity = function(security, amount, quantity, ACB) {
-  return this.reportList[InvestmentType.GAIN_LOSS] = { security, amount, quantity, ACB };
+InvestmentsReport.prototype.getReport = function(investmentProcessor) {
+  this.processIncomeType(InvestmentType.CARRY_CHARGE, investmentProcessor);
+  this.processIncomeType(InvestmentType.DIVIDEND, investmentProcessor);
+  this.processIncomeType(InvestmentType.INTEREST, investmentProcessor);
+  this.processGainLossType(InvestmentType.GAIN_LOSS, investmentProcessor);
+}
+
+
+InvestmentsReport.prototype.processIncomeType = function(type, investmentProcessor) {
+
+}
+
+InvestmentsReport.prototype.processGainLossType = function(type, investmentProcessor) {
+
 }
