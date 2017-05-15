@@ -5,20 +5,14 @@
 "use strict";
 
 
-// Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
-if (global.RUN_ON_NODE) {
-  var Security = require('./Transaction.js').Security;
-  var InvestmentType = require('./InvestmentType.js').InvestmentType;
-
-  module.exports = InvestmentsReport;
-}
-
-
 var SheetConfig = {
   DataRange: 'K1',
   DateColumns: {'REPORT_TYPE': 0, 'SECURIT_ID': 1, 'AMOUNT': 2, 'GAIN_LOSS': 3, 'QUANTITY': 4, 'ACB': 5 }
 };
+
+var IncomeSecurity = {'SECURITY': null, 'AMOUNT': null};
+var CarryChargeSecurity = {'SECURITY': null, 'AMOUNT': null};
+var OrderSecurity = {'SECURITY': null, 'AMOUNT': null, 'GAIN_LOSS': null, 'TOTAL_QUANTITY': null, 'TOTAL_BOOK_VALUE': null}
 
 
 /**
@@ -63,4 +57,14 @@ InvestmentsReport.prototype.processIncomeType = function(type, investmentProcess
 
 InvestmentsReport.prototype.processGainLossType = function(type, investmentProcessor) {
 
+}
+
+
+// Configuration to run on node with mock data
+global.RUN_ON_NODE = true;
+if (global.RUN_ON_NODE) {
+  var Security = require('./Transaction.js').Security;
+  var InvestmentType = require('./InvestmentType.js').InvestmentType;
+
+  module.exports.InvestmentsReport = InvestmentsReport;
 }

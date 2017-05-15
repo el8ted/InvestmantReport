@@ -5,16 +5,6 @@
 "use strict";
 
 
-// Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
-if (global.RUN_ON_NODE) {
-  module.exports.ActiveSpreadsheet = ActiveSpreadsheet;
-  module.exports.ActiveSheet = ActiveSheet;
-  module.exports.ArrayLib = ArrayLib;
-  module.exports.Range = Range;
-  module.exports.SpreadsheetApp = SpreadsheetApp;
-}
-
 /**
  * ActiveSpreadsheet
  */
@@ -64,3 +54,14 @@ function SpreadsheetApp() {}
 SpreadsheetApp.prototype.getActiveSheet = function (sheetName) { return new ActiveSheet(); };
 SpreadsheetApp.prototype.getActiveSpreadsheet = function () { return new ActiveSpreadsheet(); };
 SpreadsheetApp.prototype.setActiveSheet = function (sheetName) {};
+
+
+// Configuration to run on node with mock data
+global.RUN_ON_NODE = true;
+if (global.RUN_ON_NODE) {
+  module.exports.ActiveSpreadsheet = ActiveSpreadsheet;
+  module.exports.ActiveSheet = ActiveSheet;
+  module.exports.ArrayLib = ArrayLib;
+  module.exports.Range = Range;
+  module.exports.SpreadsheetApp = SpreadsheetApp;
+}

@@ -5,32 +5,6 @@
 "use strict";
 
 
-// Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
-if (global.RUN_ON_NODE) {
-  var SpreadSheetAppModule = require('./mock_google_service/SpreadsheetApp.js');
-  var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
-  var ArrayLib = new SpreadSheetAppModule.ArrayLib();
-
-  var TransactionModule = require('./Transaction.js');
-  var Security = TransactionModule.Security;
-  var BaseTransaction = TransactionModule.BaseTransaction;
-  var DividendTransaction = TransactionModule.DividendTransaction;
-  var InterestTransaction = TransactionModule.InterestTransaction;
-  var CarryChargeTransaction = TransactionModule.CarryChargeTransaction;
-  var OrderTransaction = TransactionModule.OrderTransaction;
-  var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
-
-  var InvestmentsProcessor = require('./InvestmentsProcessor.js');
-  var InvestmentsReport = require('./InvestmentsReport.js');
-  
-  function node_init() {
-    main();
-  }
-  
-  module.exports = node_init;
-}
-
 var SheetConfig = {
   DataRange: 'A:H',
   DateColumns: {'TRADE_DATE': 0, 'ACCOUNT': 1, 'SECURITY_ID': 2, 'AMOUNT': 3, 'QUANTITY': 4, 'DIVIDEND': 5, 'USD_RATE': 6 }
@@ -143,4 +117,32 @@ function main() {
     addTransaction(investmentsProcessor, sheetTransactions[k]);
 
   investmentsReport.getReport(investmentsProcessor);
+}
+
+
+// Configuration to run on node with mock data
+global.RUN_ON_NODE = true;
+if (global.RUN_ON_NODE) {
+  var SpreadSheetAppModule = require('./mock_google_service/SpreadsheetApp.js');
+  var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
+  var ArrayLib = new SpreadSheetAppModule.ArrayLib();
+
+  var TransactionModule = require('./Transaction.js');
+  var Security = TransactionModule.Security;
+  var BaseTransaction = TransactionModule.BaseTransaction;
+  var DividendTransaction = TransactionModule.DividendTransaction;
+  var InterestTransaction = TransactionModule.InterestTransaction;
+  var CarryChargeTransaction = TransactionModule.CarryChargeTransaction;
+  var OrderTransaction = TransactionModule.OrderTransaction;
+  var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
+
+  var InvestmentsProcessor = require('./InvestmentsProcessor.js');
+  var InvestmentsReportModule = require('./InvestmentsReport.js');
+  var InvestmentsReport = InvestmentsReportModule.InvestmentsReport;
+  
+  function node_init() {
+    main();
+  }
+  
+  module.exports = node_init;
 }
