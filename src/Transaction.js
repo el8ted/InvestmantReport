@@ -3,21 +3,9 @@
  */
 "use strict";
 
-
-// Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
-if (global.RUN_ON_NODE) {
-  module.exports.Security = Security;
-  module.exports.BaseTransaction = BaseTransaction;
-  module.exports.DividendTransaction = DividendTransaction;
-  module.exports.InterestTransaction = InterestTransaction;
-  module.exports.CarryChargeTransaction = CarryChargeTransaction;
-  module.exports.OrderTransaction = OrderTransaction;
-  module.exports.OptionOrderTransaction = OptionOrderTransaction;
-}
-
 /**
- * Security object
+ * @param {string} accountCurrency, 
+ * @param {string} securityID
  */
 function Security(accountCurrency, securityID) {
   this.accountCurrency = accountCurrency;
@@ -26,11 +14,22 @@ function Security(accountCurrency, securityID) {
 
 Security.prototype.getAccountCurrency = function() { return this.accountCurrency; };
 Security.prototype.getSecurityID = function() { return this.securityID; };
-Security.prototype.getUID = function() { return this.accountCurrency + "_" + this.securityID; };
+
+/**
+ * @returns {string} unique representation of security
+ */
+Security.prototype.getUID = function() {
+  return this.accountCurrency + "_" + this.securityID;
+};
 
 
 /**
  * Base transection object
+ * @param  {string} accountCurrency
+ * @param  {string} securityID
+ * @param  {string} tradeDate
+ * @param  {number} amount
+ * @param  {number} usdRate
  */
 function BaseTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
   this.security = new Security(accountCurrency, securityID);
@@ -47,9 +46,13 @@ BaseTransaction.prototype.getUSDRate = function() { return this.usdRate; };
 
 
 /**
- * @param amountWithheld - optional
- * @param quantity - optional
- * @param usdRate - optional
+ * Extends Base Transaction
+ * @param  {string} accountCurrency
+ * @param  {string} securityID
+ * @param  {string} tradeDate
+ * @param  {number} amount can be positive or negative. negative indicates dividend tax withheld 
+ * @param  {number} usdRate
+ * @param  {number} quantity
  */
 function DividendTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity) {
   if (typeof amount !== 'undefined') {
@@ -74,7 +77,12 @@ DividendTransaction.prototype.getQuantity = function() { return this.quantity; }
 
 
 /**
- * @param usdRate - optional
+ * Extends Base Transaction
+ * @param  {string} accountCurrency
+ * @param  {string} securityID
+ * @param  {} tradeDate
+ * @param  {} amount
+ * @param  {} usdRate optional
  */
 function InterestTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
   BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
@@ -86,7 +94,12 @@ InterestTransaction.prototype.getInvestmentType = function() { return 'INTEREST'
 
 
 /**
- * @param usdRate - optional
+ * Extends Base Transaction
+ * @param  {string} accountCurrency
+ * @param  {string} securityID
+ * @param  {string} tradeDate
+ * @param  {number} amount
+ * @param  {number} usdRate optional
  */
 function CarryChargeTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
   BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
@@ -98,9 +111,14 @@ CarryChargeTransaction.prototype.getInvestmentType = function() { return 'CARRY_
 
 
 /**
+ * Extends Base Transaction
  * TODO: add support for commission, exchange traded debentures
- * @param amount - optional. net amount of order (after commission)
- * @param usdRate - optional
+ * @param  {string} accountCurrency
+ * @param  {string} securityID
+ * @param  {string} tradeDate
+ * @param  {number} amount net amount of order (after commission)
+ * @param  {number} usdRate optional
+ * @param  {number} quantity optional
  */
 function OrderTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity) {
   BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
@@ -114,16 +132,35 @@ OrderTransaction.prototype.getQuantity = function() { return this.quantity; };
 
 
 /**
- * TODO: add commission support
- * @param amount - optional. net amount of order (after commission)
- * @param usdRate - optional
+ * Extends Order Transaction
+ * TODO: add support for commission
+ * @param  {string} accountCurrency
+ * @param  {string} securityID
+ * @param  {string} tradeDate
+ * @param  {number} amount net amount of order (after commission)
+ * @param  {number} usdRate optional
+ * @param  {number} quantity
+ * @param  {number} multiplier optional
  */
 function OptionOrderTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity, multiplier) {
   OrderTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate, quantity);
-  this.multiplier = (typeof multiplier !== 'undefined') ? multiplier : null;
+  this.multiplier = (typeof multiplier !== 'undefined') ? multiplier : 100;
 }
 
 OptionOrderTransaction.prototype = Object.create(OrderTransaction.prototype);
 OptionOrderTransaction.prototype.constructor = OptionOrderTransaction;
 OptionOrderTransaction.prototype.getInvestmentType = function() { return 'OPTION_ORDER'; };
 OptionOrderTransaction.prototype.getMultiplier = function() { return this.multiplier; };
+
+
+// Configuration to run on node with mock data
+global.RUN_ON_NODE = true;
+if (global.RUN_ON_NODE) {
+  module.exports.Security = Security;
+  module.exports.BaseTransaction = BaseTransaction;
+  module.exports.DividendTransaction = DividendTransaction;
+  module.exports.InterestTransaction = InterestTransaction;
+  module.exports.CarryChargeTransaction = CarryChargeTransaction;
+  module.exports.OrderTransaction = OrderTransaction;
+  module.exports.OptionOrderTransaction = OptionOrderTransaction;
+}
