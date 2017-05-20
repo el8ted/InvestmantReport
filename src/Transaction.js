@@ -3,25 +3,6 @@
  */
 "use strict";
 
-/**
- * @param {string} accountCurrency, 
- * @param {string} securityID
- */
-function Security(accountCurrency, securityID) {
-  this.accountCurrency = accountCurrency;
-  this.securityID = securityID;
-}
-
-Security.prototype.getAccountCurrency = function() { return this.accountCurrency; };
-Security.prototype.getSecurityID = function() { return this.securityID; };
-
-/**
- * @returns {string} unique representation of security
- */
-Security.prototype.getUID = function() {
-  return this.accountCurrency + "_" + this.securityID;
-};
-
 
 /**
  * Base transection object
@@ -156,7 +137,8 @@ OptionOrderTransaction.prototype.getMultiplier = function() { return this.multip
 // Configuration to run on node with mock data
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
-  module.exports.Security = Security;
+  var Security = require('./Security.js').Security;
+
   module.exports.BaseTransaction = BaseTransaction;
   module.exports.DividendTransaction = DividendTransaction;
   module.exports.InterestTransaction = InterestTransaction;
