@@ -38,15 +38,6 @@ TransactionSet.prototype.getTransactions = function(type, security) {
 };
 
 /**
- * @param {Security} security - optional
- * @returns {[OptionOrderTransaction]]} if security is specified, returns list matching only security
- */
-TransactionSet.prototype.getOptionOrderTransaction = function(security) {
-  //TODO: need to implement
-  return this.transactionsList[InvestmentType.OPTION_ORDER];
-};
-
-/**
  * @param {InvestmentType}
  * @returns {[Security]} unique list matching the investment type
  */
