@@ -18,43 +18,23 @@ TransactionSet.prototype.addTransaction = function(transaction) {
 };
 
 /**
- * @returns {[CarryChargeTransaction]}
- */
-TransactionSet.prototype.getCarryChargeTransactions = function() {
-  return this.transactionsList[InvestmentType.CARRY_CHARGE];
-};
-
-/**
- * @returns {[DividendTransaction]}
- */
-TransactionSet.prototype.getDividendTransactions = function() {
-  return this.transactionsList[InvestmentType.DIVIDEND];
-};
-
-/**
- * @returns {[InterestTransaction]}
- */
-TransactionSet.prototype.getInterestTransactions = function() {
-  return this.transactionsList[InvestmentType.INTEREST];
-};
-
-/**
+ * @param {InvestmentType} type
  * @param {Security} security - optional
- * @returns {[OrderTransaction]]} if security is specified, returns list matching only security
+ * @returns {[OrderTransaction]]} returns array matching type. if security is specified, returns only type + security
  */
-TransactionSet.prototype.getOrderTransactions = function(security) {
-  var orders = [];
+TransactionSet.prototype.getTransactions = function(type, security) {
+  var transactions = [];
 
   if (typeof security === 'undefined')
-    return this.transactionsList[InvestmentType.ORDERS];
+    return this.transactionsList[type];
   else {
-    for (var i = 0; i < this.transactionsList[InvestmentType.ORDERS].length; i++) {
-      if (security.getUID() === this.transactionsList[InvestmentType.ORDERS][i].getSecurity().getUID())
-        orders.push(this.transactionsList[InvestmentType.ORDERS][i]);
+    for (var i = 0; i < this.transactionsList[type].length; i++) {
+      if (security.getUID() === this.transactionsList[type][i].getSecurity().getUID())
+        transactions.push(this.transactionsList[type][i]);
     };
   }
 
-  return orders;
+  return transactions;
 };
 
 /**
