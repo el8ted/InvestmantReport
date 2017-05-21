@@ -11,7 +11,7 @@ function TransactionSet() {
 }
 
 /**
- * @param {Transaction} transaction
+ * @param {Parent of BaseTransaction} transaction
  */
 TransactionSet.prototype.addTransaction = function(transaction) {
   this.transactionsList[transaction.getInvestmentType()].push(transaction);
