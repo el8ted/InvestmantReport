@@ -3,6 +3,8 @@
  * Class to interact with getting data from active sheet and put report in the same active sheet
  */
 "use strict";
+if (global === undefined)
+  var global = {};
 global.RUN_ON_NODE = true;
 
 
@@ -115,9 +117,24 @@ function main() {
   for (var k = 0; k < sheetTransactions.length; k++)
     addTransaction(investmentSheetReport, sheetTransactions[k]);
 
-  writeReportToActiveSheet(investmentSheetReport.getReport());
+  writeReportToActiveSheet(investmentSheetReport);
 }
 
+/**
+ * Writes report to active sheet
+ * @param {InvestmentSheetReport} investmentSheetReport
+ */
+var writeReportToActiveSheet = function (investmentSheetReport) {
+  var report = investmentSheetReport.getReport();
+  var arrayTotals = [['Investment Type',      'CAD',                         'USD'],
+                     ['Carry Charge',         report.totals.carryCharge.CAD, report.totals.carryCharge.USD],
+                     ['Interest',             report.totals.interest.CAD,    report.totals.interest.USD],
+                     ['Dividends',            report.totals.dividend.CAD,    report.totals.dividend.USD],
+                     ['Realized Gain & Loss', report.totals.gainLoss.CAD,    report.totals.gainLoss.USD]];
+
+  SpreadsheetApp.setActiveSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName("2011 New")); //TODO: For debug mode only
+  var sheet = SpreadsheetApp.getActiveSheet().getRange("K2:M6").setValues(arrayTotals);
+};
 
 // Configuration to run on node with mock data
 if (global.RUN_ON_NODE) {

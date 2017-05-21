@@ -3,6 +3,8 @@
  * Class to interact with putting data into report of the active sheet
  */
 "use strict";
+if (global === undefined)
+  var global = {};
 global.RUN_ON_NODE = true;
 
 var SheetConfig = {
@@ -75,20 +77,20 @@ InvestmentSheetReport.prototype.getSecurityListByType = function (type) {
  */
 InvestmentSheetReport.prototype.refreshReport = function() {
   // TODO: refactor this function
-  this.report.totals = {'carryChage': {'CAD': 0, 'USD': 0},
+  this.report.totals = {'carryCharge': {'CAD': 0, 'USD': 0},
                         'dividend':   {'CAD': 0, 'USD': 0},
                         'interest':   {'CAD': 0, 'USD': 0},
                         'gainLoss':   {'CAD': 0, 'USD': 0}};
-  this.report.securityListByType = {'carryChage': [], 'dividend': [], 'interest': [], 'gainLoss': [] };
+  this.report.securityListByType = {'carryCharge': [], 'dividend': [], 'interest': [], 'gainLoss': [] };
 
   // refresh list of securities
-  this.report.securityListByType.carryChage = this.getSecurityListByType(InvestmentType.CARRY_CHARGE);
+  this.report.securityListByType.carryCharge = this.getSecurityListByType(InvestmentType.CARRY_CHARGE);
   this.report.securityListByType.dividend = this.getSecurityListByType(InvestmentType.DIVIDEND);
   this.report.securityListByType.interest = this.getSecurityListByType(InvestmentType.INTEREST);
   this.report.securityListByType.gainLoss = this.getSecurityListByType(InvestmentType.ORDERS);
 
   // refresh totals
-  var investmentTypes = ['carryChage', 'dividend', 'interest', 'gainLoss'];
+  var investmentTypes = ['carryCharge', 'dividend', 'interest', 'gainLoss'];
   for (var type in investmentTypes) {
     type = investmentTypes[type];
 
