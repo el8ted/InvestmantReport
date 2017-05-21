@@ -24,7 +24,8 @@ InvestmentsAccount.prototype.addTransaction = function (transaction) {
  * @return {{security, amount}}
  */
 InvestmentsAccount.prototype.getCarryChargeBySecurity = function (security) {
-  return this.getIncomeOrCarryAmountByBySecurity(InvestmentType.CARRY_CHARGE, security);
+  var amount = this.getIncomeOrCarryAmountByBySecurity(InvestmentType.CARRY_CHARGE, security);
+  return {'security': security, 'amount': amount};
 };
 
 /**
@@ -32,7 +33,8 @@ InvestmentsAccount.prototype.getCarryChargeBySecurity = function (security) {
  * @return {{security, amount}}
  */
 InvestmentsAccount.prototype.getDividendBySecurity = function (security) {
-  return this.getIncomeOrCarryAmountByBySecurity(InvestmentType.DIVIDEND, security);
+  var amount = this.getIncomeOrCarryAmountByBySecurity(InvestmentType.DIVIDEND, security);
+  return {'security': security, 'amount': amount};
 };
 
 /**
@@ -40,7 +42,8 @@ InvestmentsAccount.prototype.getDividendBySecurity = function (security) {
  * @return {{security, amount}}
  */
 InvestmentsAccount.prototype.getInterestBySecurity = function (security) {
-  return this.getIncomeOrCarryAmountByBySecurity(InvestmentType.INTEREST, security);
+  var amount = this.getIncomeOrCarryAmountByBySecurity(InvestmentType.INTEREST, security);
+  return {'security': security, 'amount': amount};
 };
 
 /**
@@ -55,8 +58,11 @@ InvestmentsAccount.prototype.getIncomeOrCarryAmountByBySecurity = function(type,
   var transactions = this.transactionsSet.getTransactions(type, security);
   var totalAmount = 0
 
-  for (var j = 0; j < transactions.length; j++)
+  for (var j = 0; j < transactions.length; j++) {
     totalAmount += Number(transactions[j].getAmount());
+    if (type === InvestmentType.DIVIDEND)
+      totalAmount += Number(transactions[j].getAmountWithheld());
+  }
 
   return totalAmount;
 }

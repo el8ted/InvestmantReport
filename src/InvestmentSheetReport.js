@@ -53,10 +53,13 @@ InvestmentSheetReport.prototype.getReportByType = function (type) {
       switch (type) {
         case InvestmentType.CARRY_CHARGE:
           report.push(this.investmentsAccount.getCarryChargeBySecurity(securities[securityKey]));
+          break;
         case InvestmentType.DIVIDEND:
           report.push(this.investmentsAccount.getDividendBySecurity(securities[securityKey]));
+          break;
         case InvestmentType.INTEREST:
           report.push(this.investmentsAccount.getInterestBySecurity(securities[securityKey]));
+          break;
         case InvestmentType.ORDERS:
           report.push(this.investmentsAccount.getRealizedGainLossBySecurity(securities[securityKey]));
       }
