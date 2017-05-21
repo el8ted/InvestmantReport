@@ -30,13 +30,13 @@ function InvestmentsReport() {
       if (securities.hasOwnProperty(securityKey))
         switch (securities[securityKey].getInvestmentType()) {
           case InvestmentType.CARRY_CHARGE:
-            report.push(this.InvestmentsAccount.getCarryChargeBySecurity(securityIDs[securityKey]));
+            report.push(InvestmentsAccount.getCarryChargeBySecurity(securityIDs[securityKey]));
           case InvestmentType.DIVIDEND:
-            report.push(this.InvestmentsAccount.getDividendBySecuirty(securityIDs[securityKey]));
+            report.push(InvestmentsAccount.getDividendBySecuirty(securityIDs[securityKey]));
           case InvestmentType.INTEREST:
-            report.push(this.InvestmentsAccount.getInterestBySecurity(securityIDs[securityKey]));
+            report.push(InvestmentsAccount.getInterestBySecurity(securityIDs[securityKey]));
           case InvestmentType.GAIN_LOSS:
-            report.push(this.InvestmentsAccount.getRealizedGainLossBySecurity(securityIDs[securityKey]));
+            report.push(InvestmentsAccount.getRealizedGainLossBySecurity(securityIDs[securityKey]));
         }
     
     return report;
