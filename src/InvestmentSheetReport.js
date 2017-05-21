@@ -13,47 +13,21 @@ var SheetConfig = {
 /**
  * Report class 
  */
-function InvestmentsReport() {
-  this.InvestmentsAccount = new InvestmentsAccount();
-
-  /**
-   * @param {InvestmentType} type
-   * @returns  {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
-   */
-  function getReportByType(type) {
-    var securities = this.InvestmentsAccount.getUniqueSecurities(type);
-    var securityKey;
-    var report = [];
-
-    // TODO: add option order transaction
-    for (securityKey in securities)
-      if (securities.hasOwnProperty(securityKey))
-        switch (securities[securityKey].getInvestmentType()) {
-          case InvestmentType.CARRY_CHARGE:
-            report.push(InvestmentsAccount.getCarryChargeBySecurity(securityIDs[securityKey]));
-          case InvestmentType.DIVIDEND:
-            report.push(InvestmentsAccount.getDividendBySecuirty(securityIDs[securityKey]));
-          case InvestmentType.INTEREST:
-            report.push(InvestmentsAccount.getInterestBySecurity(securityIDs[securityKey]));
-          case InvestmentType.GAIN_LOSS:
-            report.push(InvestmentsAccount.getRealizedGainLossBySecurity(securityIDs[securityKey]));
-        }
-    
-    return report;
-  }
+function InvestmentSheetReport() {
+  this.investmentsAccount = new InvestmentsAccount();
 }
 
 /**
  * @param  {Parent of BaseTransaction} transaction
  */
-InvestmentsReport.prototype.addTransaction = function(transaction) {
-  this.InvestmentsAccount.addTransaction(transaction);
+InvestmentSheetReport.prototype.addTransaction = function(transaction) {
+  this.investmentsAccount.addTransaction(transaction);
 }
 
 /**
  * @returns {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
  */
-InvestmentsReport.prototype.getReport = function() {
+InvestmentSheetReport.prototype.getReport = function() {
   var reportList = {'carryChage': [], 'dividend': [], 'interest': [], 'gainLoss': [] };
 
   reportList.carryChage = this.getReportByType(InvestmentType.CARRY_CHARGE);
@@ -64,6 +38,32 @@ InvestmentsReport.prototype.getReport = function() {
   return reportList;
 }
 
+/**
+ * @param {InvestmentType} type
+ * @returns  {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
+ */
+InvestmentSheetReport.prototype.getReportByType = function (type) {
+  var securities = this.investmentsAccount.getUniqueSecurities(type);
+  var securityKey;
+  var report = [];
+
+  // TODO: add option order transaction
+  for (securityKey in securities)
+    if (securities.hasOwnProperty(securityKey))
+      switch (type) {
+        case InvestmentType.CARRY_CHARGE:
+          report.push(this.investmentsAccount.getCarryChargeBySecurity(securities[securityKey]));
+        case InvestmentType.DIVIDEND:
+          report.push(this.investmentsAccount.getDividendBySecurity(securities[securityKey]));
+        case InvestmentType.INTEREST:
+          report.push(this.investmentsAccount.getInterestBySecurity(securities[securityKey]));
+        case InvestmentType.GAIN_LOSS:
+          report.push(this.investmentsAccount.getRealizedGainLossBySecurity(securities[securityKey]));
+      }
+  
+  return report;
+}
+
 // Configuration to run on node with mock data
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
@@ -71,13 +71,5 @@ if (global.RUN_ON_NODE) {
   var InvestmentType = require('./InvestmentType.js').InvestmentType;
   var InvestmentsAccount = require('./InvestmentsAccount.js');
 
-  module.exports.InvestmentsSheetReport = InvestmentsSheetReport;
-  module.exports.CarryChargeSecurity = CarryChargeSecurity;
-  module.exports.DividendSecurity = DividendSecurity;
-  module.exports.OrderSecurity = OrderSecurity;
+  module.exports.InvestmentSheetReport = InvestmentSheetReport;
 }
-
-/**
-var IncomeSecurity = {'security': null, 'amount': null};
-var CarryChargeSecurity = {'security': null, 'amount': null};;
-var DividendSecurity = {'security': null, 'amount': null};;*/

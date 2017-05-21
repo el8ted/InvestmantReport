@@ -42,7 +42,7 @@ TransactionSet.prototype.getTransactions = function(type, security) {
  * @returns {[Security]} unique list matching the investment type
  */
 TransactionSet.prototype.getUniqueSecurities = function (type) {
-  var list = {UIDs: [], securities = []};
+  var list = {'UIDs': [], 'securities': []};
   var UID;
 
   for (var i = 0; i < this.transactionsList[type].length; i++) {

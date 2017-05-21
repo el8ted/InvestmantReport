@@ -8,82 +8,6 @@
  */
 function InvestmentsAccount() {
   this.transactionsSet = new TransactionSet();
-
-  /**
-   * @param {InvestmentType} type must be CARRY_CHARGE, DIVIDEND, or INTEREST
-   * @param {Security} security
-   * @returns {Number} returns sum amount of transactions matching type and security
-   */
-  function getIncomeOrCarryAmountByBySecurity(type, security) {
-    if ((type !== InvestmentType.CARRY_CHARGE) || (type !== InvestmentType.DIVIDEND) || (type !== InvestmentType.INTEREST))
-      throw "InvestmentsAccount.getIncomeOrCarryAmountByBySecurity: invalid type"
-
-    var transactions = this.transactionsSet.getTransactions(type, security);
-    var totalAmount = 0
-
-    for (var j = 0; j < transactions.length; j++)
-      totalAmount += Number(transactions[j].getAmount());
-
-    return totalAmount;
-  }
-
-  /**
-   * @param  {[OrderTransactions]} orders
-   * @param  {{number, number, number}} total {quantity, bookValue, avgCostPerQuantity}
-   * @param  {{string, number}} order {date, quantity, amount}
-   * @param  {string} nextDate
-   * @param  {number} gainLoss
-   * @param  {number} n
-   * @returns  {number} new book value after processing transactions
-   */
-  function getUpdatedTotalBookValue (orders, total, order, nextDate, gainLoss, n) {
-    // Expiring contract or transaction closes entire position
-    if (order.quantity !== 0 && total.quantity === 0)
-      total.bookValue = 0;
-    // Buy action
-    else if (order.quantity > 0 && total.quantity >= 0)
-      totalBookValue -= amount;
-    // Cover transaction
-    else if (order.quantity < 0 && total.quantity < 0)
-      total.bookValue -= amount;
-    // Sell action
-    else {
-      // Calculation is based on superfical loss rule
-      total.bookValue += (order.quantity * this.ACB);
-
-      if ((total.quantity !== 0) && isBoughtBackWithin30Days(orders, n) && (gainLoss < 0))
-        total.bookValue -= gainLoss;
-    }
-
-    return total.bookValue;
-  };
-
-  /**
-   * FIXME: check for short covers and buy backs in a future year
-   * @param {[OrderTransaction]} orders
-   * @param {number} fromIndex
-   * @returns {boolean} true if bought back within 30 calendar days fromIndex in orders
-   */
-  function isBoughtBackWithin30Days(orders, fromIndex) {
-    var fromDate = new Date(orders[fromIndex][0]), toDate = null;
-    var quantity = 0;
-    var one_day = 1000 * 60 * 60 * 24; // seconds in an hour
-
-    for (var m = fromIndex + 1; m < orders.length; m++) {
-      toDate = new Date(orders[m][0]);
-      quantity = orders[m][4];
-
-      //FIXME: check if quantity > than previous sold amount
-      if (toDate === null)
-        return false;
-      else if ((quantity > 0) && ((toDate.getTime() - fromDate.getTime()) / one_day <= 30))
-        return true;
-      else if (quantity > 0)
-        return false;
-    }
-
-    return false;
-  }
 }
 
 /**
@@ -105,7 +29,7 @@ InvestmentsAccount.prototype.getCarryChargeBySecurity = function (security) {
  * @param {Security} security
  * @return {{security, amount}}
  */
-InvestmentsAccount.prototype.getDividendCarryChargeBySecurity = function (security) {
+InvestmentsAccount.prototype.getDividendBySecurity = function (security) {
   return this.getIncomeOrCarryAmountByBySecurity(InvestmentType.DIVIDEND, security);
 };
 
@@ -116,6 +40,24 @@ InvestmentsAccount.prototype.getDividendCarryChargeBySecurity = function (securi
 InvestmentsAccount.prototype.getInterestBySecurity = function (security) {
   return this.getIncomeOrCarryAmountByBySecurity(InvestmentType.INTEREST, security);
 };
+
+/**
+ * @param {InvestmentType} type must be CARRY_CHARGE, DIVIDEND, or INTEREST
+ * @param {Security} security
+ * @returns {Number} returns sum amount of transactions matching type and security
+ */
+InvestmentsAccount.prototype.getIncomeOrCarryAmountByBySecurity = function(type, security) {
+  if ((type !== InvestmentType.CARRY_CHARGE) && (type !== InvestmentType.DIVIDEND) && (type !== InvestmentType.INTEREST))
+    throw "InvestmentsAccount.getIncomeOrCarryAmountByBySecurity: invalid type"
+
+  var transactions = this.transactionsSet.getTransactions(type, security);
+  var totalAmount = 0
+
+  for (var j = 0; j < transactions.length; j++)
+    totalAmount += Number(transactions[j].getAmount());
+
+  return totalAmount;
+}
 
 /**
  * @param {Security} security
@@ -138,8 +80,8 @@ InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security)
     order.usdRate = (orders[j].getUSDRate()) ? Number(orders[j].getUSDRate()): null;
 
     // Convert USD values to CAD
-    if (usdRate !== null)
-      amount *= usdRate;
+    if (order.usdRate !== null)
+      order.amount *= order.usdRate;
 
     // Catch rounding errors
     total.quantity = total.quantity + order.quantity;
@@ -155,14 +97,14 @@ InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security)
         total.gainLoss += gainLoss;
     }
 
-    total.bookValue = this.getUpdatedTotalBookValue(order, total, order, nextDate, gainLoss, j);
+    total.bookValue = getUpdatedTotalBookValue(orders, total, order, nextDate, gainLoss, j);
     if (total.quantity !== 0)
       total.ACB = total.bookValue / total.quantity;
     else
       total.ACB  = 0;
   }
 
-  return {'security': security, 'totalGainLoss': totalGainLoss, 'totalQuantity': totalQuantity, 'totalBookValue': totalBookValue};
+  return {'security': security, 'totalGainLoss': total.gainLoss, 'totalQuantity': total.quantity, 'totalBookValue': total.bookValue};
 };
 
 /**
@@ -173,18 +115,69 @@ InvestmentsAccount.prototype.getUniqueSecurities = function(type) {
   return this.transactionsSet.getUniqueSecurities(type);
 }
 
+/**
+ * @param  {[OrderTransactions]} orders
+ * @param  {{number, number, number}} total {quantity, bookValue, ACB}
+ * @param  {{string, number}} order {date, quantity, amount}
+ * @param  {string} nextDate
+ * @param  {number} gainLoss
+ * @param  {number} n
+ * @returns  {number} new book value after processing transactions
+ */
+function getUpdatedTotalBookValue (orders, total, order, nextDate, gainLoss, n) {
+  // Expiring contract or transaction closes entire position
+  if (order.quantity !== 0 && total.quantity === 0)
+    total.bookValue = 0;
+  // Buy action
+  else if (order.quantity > 0 && total.quantity >= 0)
+    total.bookValue -= order.amount;
+  // Cover transaction
+  else if (order.quantity < 0 && total.quantity < 0)
+    total.bookValue -= amount;
+  // Sell action
+  else {
+    // Calculation is based on superfical loss rule
+    total.bookValue += (order.quantity * total.ACB);
+
+    if ((total.quantity !== 0) && isBoughtBackWithin30Days(orders, n) && (gainLoss < 0))
+      total.bookValue -= gainLoss;
+  }
+
+  return total.bookValue;
+};
+
+/**
+ * FIXME: check for short covers and buy backs in a future year
+ * @param {[OrderTransaction]} orders
+ * @param {number} fromIndex
+ * @returns {boolean} true if bought back within 30 calendar days fromIndex in orders
+ */
+function isBoughtBackWithin30Days(orders, fromIndex) {
+  var fromDate = new Date(orders[fromIndex][0]), toDate = null;
+  var quantity = 0;
+  var one_day = 1000 * 60 * 60 * 24; // seconds in an hour
+
+  for (var m = fromIndex + 1; m < orders.length; m++) {
+    toDate = new Date(orders[m][0]);
+    quantity = orders[m][4];
+
+    //FIXME: check if quantity > than previous sold amount
+    if (toDate === null)
+      return false;
+    else if ((quantity > 0) && ((toDate.getTime() - fromDate.getTime()) / one_day <= 30))
+      return true;
+    else if (quantity > 0)
+      return false;
+  }
+
+  return false;
+}
 
 // Configuration to run on node with mock data
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var TransactionSet = require('./TransactionSet.js').TransactionSet;
   var InvestmentType = require('./InvestmentType.js').InvestmentType;
-
-  var InvestmentsReportModule = require('./InvestmentsReport.js');
-  InvestmentsReport = InvestmentsReportModule.InvestmentsReport;
-  CarryChargeSecurity = InvestmentsReportModule.CarryChargeSecurity;
-  DividendSecurity = InvestmentsReportModule.DividendSecurity;
-  OrderSecurity = InvestmentsReportModule.OrderSecurity;
 
   module.exports = InvestmentsAccount;
 }

@@ -14,19 +14,19 @@ var SheetConfig = {
 /**
  * @param transaction
  */
-var addTransaction = function (addTransactionCallback, transaction) {
+var addTransaction = function (investmentSheetReport, transaction) {
   if ((transaction[SheetConfig.DateColumns.AMOUNT] !== '') &&
       (transaction[SheetConfig.DateColumns.QUANTITY] === '') &&
       (transaction[SheetConfig.DateColumns.DIVIDEND]) === '') {
 
     if (transaction[SheetConfig.DateColumns.AMOUNT] >= 0)
-      addTransactionCallback(new InterestTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
+      investmentSheetReport.addTransaction(new InterestTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
                                                      transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                      transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                      transaction[SheetConfig.DateColumns.AMOUNT],
                                                     transaction[SheetConfig.DateColumns.USD_RATE]));
     else 
-      addTransactionCallback(new CarryChargeTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
+      investmentSheetReport.addTransaction(new CarryChargeTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
                                                         transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                         transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                         transaction[SheetConfig.DateColumns.AMOUNT],
@@ -35,7 +35,7 @@ var addTransaction = function (addTransactionCallback, transaction) {
   }
 
   if (transaction[SheetConfig.DateColumns.DIVIDEND] !== '')
-    addTransactionCallback(new DividendTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
+    investmentSheetReport.addTransaction(new DividendTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
                                                    transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                    transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                    transaction[SheetConfig.DateColumns.DIVIDEND],
@@ -46,7 +46,7 @@ var addTransaction = function (addTransactionCallback, transaction) {
     if ((transaction[SheetConfig.DateColumns.SECURITY_ID].slice(5) === 'CALL-') ||
         (transaction[SheetConfig.DateColumns.SECURITY_ID].slice(5) === 'PUT-'))
       // TODO: remove hard coding of multiplier
-      addTransactionCallback(new OptionOrderTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
+      investmentSheetReport.addTransaction(new OptionOrderTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
                                                         transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                         transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                         transaction[SheetConfig.DateColumns.AMOUNT],
@@ -54,7 +54,7 @@ var addTransaction = function (addTransactionCallback, transaction) {
                                                         transaction[SheetConfig.DateColumns.QUANTITY],
                                                         100));
     else
-      addTransactionCallback(new OrderTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
+      investmentSheetReport.addTransaction(new OrderTransaction(transaction[SheetConfig.DateColumns.ACCOUNT],
                                                   transaction[SheetConfig.DateColumns.SECURITY_ID],
                                                   transaction[SheetConfig.DateColumns.TRADE_DATE],
                                                   transaction[SheetConfig.DateColumns.AMOUNT],
@@ -108,13 +108,13 @@ var loadAllTransactionsFromActiveSheet = function () {
  * Main app function
  */
 function main() {
-  var investmentsSheetReport = new InvestmentsSheetReport();
+  var investmentSheetReport = new InvestmentSheetReport();
 
   var sheetTransactions = loadAllTransactionsFromActiveSheet();
   for (var k = 0; k < sheetTransactions.length; k++)
-    addTransaction(investmentsSheetReport.addTransaction, sheetTransactions[k]);
+    addTransaction(investmentSheetReport, sheetTransactions[k]);
 
-  investmentsSheetReport.getReport();
+  investmentSheetReport.getReport();
 }
 
 
@@ -134,7 +134,7 @@ if (global.RUN_ON_NODE) {
   var OrderTransaction = TransactionModule.OrderTransaction;
   var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
   
-  var InvestmentsSheetReport = require('./InvestmentsSheetReport.js').InvestmentsSheetReport;
+  var InvestmentSheetReport = require('./InvestmentSheetReport.js').InvestmentSheetReport;
   
   function node_init() {
     main();
