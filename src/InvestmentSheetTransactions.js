@@ -115,7 +115,7 @@ function main() {
   for (var k = 0; k < sheetTransactions.length; k++)
     addTransaction(investmentSheetReport, sheetTransactions[k]);
 
-  investmentSheetReport.getReport();
+  writeReportToActiveSheet(investmentSheetReport.getReport());
 }
 
 

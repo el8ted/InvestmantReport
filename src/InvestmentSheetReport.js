@@ -6,8 +6,9 @@
 global.RUN_ON_NODE = true;
 
 var SheetConfig = {
-  DataRange: 'K9',
-  DateColumns: {'REPORT_TYPE': 0, 'SECURITY_ID': 1, 'AMOUNT': 2, 'GAIN_LOSS': 3, 'QUANTITY': 4, 'ACB': 5 }
+  totalsStartCell: 'K1',
+  securityListByTypeStartCell: 'K9',
+  securityListByTypeColumns: {'REPORT_TYPE': 0, 'SECURITY_ID': 1, 'AMOUNT': 2, 'GAIN_LOSS': 3, 'QUANTITY': 4, 'ACB': 5 }
 };
 
 /**
@@ -104,7 +105,7 @@ InvestmentSheetReport.prototype.refreshReport = function() {
     }
   }
 
-  return report;
+  return this.report;
 }
 
 // Configuration to run on node with mock data
