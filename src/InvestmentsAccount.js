@@ -133,7 +133,7 @@ function getUpdatedTotalBookValue (orders, total, order, nextDate, gainLoss, n) 
     total.bookValue -= order.amount;
   // Cover transaction
   else if (order.quantity < 0 && total.quantity < 0)
-    total.bookValue -= amount;
+    total.bookValue -= order.amount;
   // Sell action
   else {
     // Calculation is based on superfical loss rule

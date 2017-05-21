@@ -57,7 +57,7 @@ InvestmentSheetReport.prototype.getReportByType = function (type) {
           report.push(this.investmentsAccount.getDividendBySecurity(securities[securityKey]));
         case InvestmentType.INTEREST:
           report.push(this.investmentsAccount.getInterestBySecurity(securities[securityKey]));
-        case InvestmentType.GAIN_LOSS:
+        case InvestmentType.ORDERS:
           report.push(this.investmentsAccount.getRealizedGainLossBySecurity(securities[securityKey]));
       }
   
