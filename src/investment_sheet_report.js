@@ -112,9 +112,9 @@ InvestmentSheetReport.prototype.refreshReport = function() {
 
 // Configuration to run on node with mock data
 if (global.RUN_ON_NODE) {
-  var Security = require('./Security.js').Security;
-  var InvestmentType = require('./InvestmentType.js').InvestmentType;
-  var InvestmentsAccount = require('./InvestmentsAccount.js');
+  var Security = require('./security.js').Security;
+  var InvestmentType = require('./investment_type.js').InvestmentType;
+  var InvestmentsAccount = require('./investments_account.js');
 
   module.exports.InvestmentSheetReport = InvestmentSheetReport;
 }

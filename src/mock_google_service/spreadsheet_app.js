@@ -38,7 +38,7 @@ Range.prototype.getValues = function() {
   var values = null;
 
   try {
-    values = fs.readFileSync('RangeValues.txt', 'utf8');
+    values = fs.readFileSync('./resources/range_values.txt', 'utf8');
   } catch (e) { throw e; }
 
   return JSON.parse(values);

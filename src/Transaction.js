@@ -136,7 +136,7 @@ OptionOrderTransaction.prototype.getMultiplier = function() { return this.multip
 
 // Configuration to run on node with mock data
 if (global.RUN_ON_NODE) {
-  var Security = require('./Security.js').Security;
+  var Security = require('./security.js').Security;
 
   module.exports.BaseTransaction = BaseTransaction;
   module.exports.DividendTransaction = DividendTransaction;

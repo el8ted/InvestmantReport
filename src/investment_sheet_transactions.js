@@ -138,12 +138,12 @@ var writeReportToActiveSheet = function (investmentSheetReport) {
 
 // Configuration to run on node with mock data
 if (global.RUN_ON_NODE) {
-  var SpreadSheetAppModule = require('./mock_google_service/SpreadsheetApp.js');
+  var SpreadSheetAppModule = require('./mock_google_service/spreadsheet_app.js');
   var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
   var ArrayLib = new SpreadSheetAppModule.ArrayLib();
 
-  var Security = require('./Security.js').Security;
-  var TransactionModule = require('./Transaction.js');
+  var Security = require('./security.js').Security;
+  var TransactionModule = require('./transaction.js');
   var BaseTransaction = TransactionModule.BaseTransaction;
   var DividendTransaction = TransactionModule.DividendTransaction;
   var InterestTransaction = TransactionModule.InterestTransaction;
@@ -151,7 +151,7 @@ if (global.RUN_ON_NODE) {
   var OrderTransaction = TransactionModule.OrderTransaction;
   var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
   
-  var InvestmentSheetReport = require('./InvestmentSheetReport.js').InvestmentSheetReport;
+  var InvestmentSheetReport = require('./investment_sheet_report.js').InvestmentSheetReport;
   
   function node_init() {
     main();

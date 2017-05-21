@@ -184,8 +184,8 @@ function isBoughtBackWithin30Days(orders, fromIndex) {
 
 // Configuration to run on node with mock data
 if (global.RUN_ON_NODE) {
-  var TransactionSet = require('./TransactionSet.js').TransactionSet;
-  var InvestmentType = require('./InvestmentType.js').InvestmentType;
+  var TransactionSet = require('./transaction_set.js').TransactionSet;
+  var InvestmentType = require('./investment_type.js').InvestmentType;
 
   module.exports = InvestmentsAccount;
 }
