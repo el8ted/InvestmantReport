@@ -12,7 +12,7 @@ var SheetConfig = {
 
 var IncomeSecurity = {'SECURITY': null, 'AMOUNT': null};
 var CarryChargeSecurity = {'SECURITY': null, 'AMOUNT': null};
-var OrderSecurity = {'SECURITY': null, 'AMOUNT': null, 'GAIN_LOSS': null, 'TOTAL_QUANTITY': null, 'TOTAL_BOOK_VALUE': null}
+var DividendSecurity = {'SECURITY': null, 'AMOUNT': null};
 
 
 /**
@@ -20,6 +20,8 @@ var OrderSecurity = {'SECURITY': null, 'AMOUNT': null, 'GAIN_LOSS': null, 'TOTAL
  */
 function InvestmentsReport(accountCurrency, securityID) {
   this.reportList = {'CARRY_CHARGE': [], 'DIVIDEND': [], 'INTEREST': [], 'GAIN_LOSS': [] };
+
+  this.investmentsProcessor = new InvestmentsProcessor();
 }
 
 
@@ -43,6 +45,11 @@ InvestmentsReport.prototype.addInterestSecurity = function(security, amount) {
 }
 
 
+InvestmentsReport.prototype.addTransaction = function() {
+  return this.investmentsProcessor.addTransaction;
+}
+
+
 InvestmentsReport.prototype.getReport = function(investmentProcessor) {
   this.processIncomeType(InvestmentType.CARRY_CHARGE, investmentProcessor);
   this.processIncomeType(InvestmentType.DIVIDEND, investmentProcessor);
@@ -50,21 +57,33 @@ InvestmentsReport.prototype.getReport = function(investmentProcessor) {
   this.processGainLossType(InvestmentType.GAIN_LOSS, investmentProcessor);
 }
 
+/**
+ * @return {[{security, totalGainLoss, totalQuantity, totalBookValue}]}
+ */
+InvestmentsReport.prototype.getRealizedGainLossSecurities = function () {
+  var securityIDs = this.investmentsProcessor.getUniqueSecurities(InvestmentType.ORDERS);
+  var securityKey;
+  var gainLossReport = [];
 
-InvestmentsReport.prototype.processIncomeType = function(type, investmentProcessor) {
+  // TODO: add option order transaction
+  for (securityKey in securityIDs)
+    if (securityIDs.hasOwnProperty(securityKey))
+      gainLossReport.push(this.getRealizedGainLossBySecurity(securityIDs[securityKey]));
+  
 
-}
-
-InvestmentsReport.prototype.processGainLossType = function(type, investmentProcessor) {
-
-}
+  return gainLossReport;
+};
 
 
 // Configuration to run on node with mock data
 global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
-  var Security = require('./Transaction.js').Security;
+  var Security = require('./Security.js').Security;
   var InvestmentType = require('./InvestmentType.js').InvestmentType;
+  var InvestmentsProcessor = require('./InvestmentsProcessor.js');
 
   module.exports.InvestmentsReport = InvestmentsReport;
+  module.exports.CarryChargeSecurity = CarryChargeSecurity;
+  module.exports.DividendSecurity = DividendSecurity;
+  module.exports.OrderSecurity = OrderSecurity;
 }
