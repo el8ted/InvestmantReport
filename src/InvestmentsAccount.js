@@ -2,6 +2,8 @@
  * Created by Tom on 2017-05-01.
  */
 "use strict";
+global.RUN_ON_NODE = true;
+
 
 /**
  * InvestmentsAccount class
@@ -174,7 +176,6 @@ function isBoughtBackWithin30Days(orders, fromIndex) {
 }
 
 // Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var TransactionSet = require('./TransactionSet.js').TransactionSet;
   var InvestmentType = require('./InvestmentType.js').InvestmentType;

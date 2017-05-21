@@ -2,6 +2,7 @@
  * Created by Tom on 2017-05-20.
  */
 "use strict";
+global.RUN_ON_NODE = true;
 
 /**
  * @param {string} accountCurrency, 
@@ -24,7 +25,6 @@ Security.prototype.getUID = function() {
 
 
 // Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   module.exports.Security = Security;
 }

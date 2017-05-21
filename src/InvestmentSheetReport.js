@@ -3,7 +3,7 @@
  * Class to interact with putting data into report of the active sheet
  */
 "use strict";
-
+global.RUN_ON_NODE = true;
 
 var SheetConfig = {
   DataRange: 'K1',
@@ -65,7 +65,6 @@ InvestmentSheetReport.prototype.getReportByType = function (type) {
 }
 
 // Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var Security = require('./Security.js').Security;
   var InvestmentType = require('./InvestmentType.js').InvestmentType;

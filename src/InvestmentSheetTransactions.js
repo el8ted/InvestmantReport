@@ -3,6 +3,7 @@
  * Class to interact with getting data from active sheet and put report in the same active sheet
  */
 "use strict";
+global.RUN_ON_NODE = true;
 
 
 var SheetConfig = {
@@ -119,7 +120,6 @@ function main() {
 
 
 // Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var SpreadSheetAppModule = require('./mock_google_service/SpreadsheetApp.js');
   var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();

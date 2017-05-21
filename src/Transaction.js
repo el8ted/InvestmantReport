@@ -2,7 +2,7 @@
  * Created by Tom on 2017-05-01.
  */
 "use strict";
-
+global.RUN_ON_NODE = true;
 
 /**
  * Base transection object
@@ -135,7 +135,6 @@ OptionOrderTransaction.prototype.getMultiplier = function() { return this.multip
 
 
 // Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var Security = require('./Security.js').Security;
 

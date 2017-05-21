@@ -2,6 +2,7 @@
  * Created by Tom on 2017-05-01.
  */
 "use strict";
+global.RUN_ON_NODE = true;
 
 /**
  * Class to hold list of transactions, categorized by investment type
@@ -61,7 +62,6 @@ TransactionSet.prototype.getUniqueSecurities = function (type) {
 
 
 // Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
 if (global.RUN_ON_NODE) {
   var InvestmentType = require('./InvestmentType.js').InvestmentType;
 
