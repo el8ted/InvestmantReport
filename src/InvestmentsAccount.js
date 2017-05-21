@@ -97,7 +97,8 @@ InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security)
       total.quantity = 0;
 
     // Record gain/loss for closing transactions (sell, or buy to cover)
-    if (((order.quantity < 0) && (total.Quantity >= 0)) || ((order.quantity > 0) && (total.quantity <= 0))) {
+    if (((order.quantity < 0) && (total.quantity >= 0)) ||
+        ((order.quantity > 0) && (total.quantity <= 0))) {
       gainLoss = (order.quantity * total.ACB ) + order.amount;
 
       if ((total.quantity === 0) || (nextDate === null) || (gainLoss >= 0) ||
@@ -112,7 +113,7 @@ InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security)
       total.ACB  = 0;
   }
 
-  return {'security': security, 'totalGainLoss': total.gainLoss, 'totalQuantity': total.quantity, 'totalBookValue': total.bookValue};
+  return {'security': security, 'totalGainLoss': total.gainLoss, 'totalQuantity': total.quantity, 'totalBookValue': total.ACB};
 };
 
 /**

@@ -6,7 +6,7 @@
 global.RUN_ON_NODE = true;
 
 var SheetConfig = {
-  DataRange: 'K1',
+  DataRange: 'K9',
   DateColumns: {'REPORT_TYPE': 0, 'SECURITY_ID': 1, 'AMOUNT': 2, 'GAIN_LOSS': 3, 'QUANTITY': 4, 'ACB': 5 }
 };
 
@@ -15,6 +15,7 @@ var SheetConfig = {
  */
 function InvestmentSheetReport() {
   this.investmentsAccount = new InvestmentsAccount();
+  this.report = {'totals': null, 'securityListByType': null};
 }
 
 /**
@@ -25,24 +26,25 @@ InvestmentSheetReport.prototype.addTransaction = function(transaction) {
 }
 
 /**
- * @returns {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
+ * @returns { totals: {carryChage: {CAD: 0, USD: 0},
+ *                     dividend:   {CAD: 0, USD: 0},
+ *                     interest:   {CAD: 0, USD: 0},
+ *                     gainLoss:   {CAD: 0, USD: 0}},
+ *            securityList: {carryCharge: [{Security}, amount: {Number}],
+ *                           dividend:    [{Security}, amount: {Number}],
+ *                           interest:    [{Security}, amount: {Number}],
+ *                           gainLoss:    [{Security}, gainLoss: {Number}, quantity: {Number}, ACB: {Number}]}}
  */
 InvestmentSheetReport.prototype.getReport = function() {
-  var reportList = {'carryChage': [], 'dividend': [], 'interest': [], 'gainLoss': [] };
-
-  reportList.carryChage = this.getReportByType(InvestmentType.CARRY_CHARGE);
-  reportList.dividend = this.getReportByType(InvestmentType.DIVIDEND);
-  reportList.interest = this.getReportByType(InvestmentType.INTEREST);
-  reportList.gainLoss = this.getReportByType(InvestmentType.ORDERS);
-
-  return reportList;
+  this.refreshReport();
+  return this.report;
 }
 
 /**
  * @param {InvestmentType} type
  * @returns  {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
  */
-InvestmentSheetReport.prototype.getReportByType = function (type) {
+InvestmentSheetReport.prototype.getSecurityListByType = function (type) {
   var securities = this.investmentsAccount.getUniqueSecurities(type);
   var securityKey;
   var report = [];
@@ -63,7 +65,45 @@ InvestmentSheetReport.prototype.getReportByType = function (type) {
         case InvestmentType.ORDERS:
           report.push(this.investmentsAccount.getRealizedGainLossBySecurity(securities[securityKey]));
       }
-  
+
+  return report;
+}
+
+/**
+ * @returns {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
+ */
+InvestmentSheetReport.prototype.refreshReport = function() {
+  // TODO: refactor this function
+  this.report.totals = {'carryChage': {'CAD': 0, 'USD': 0},
+                        'dividend':   {'CAD': 0, 'USD': 0},
+                        'interest':   {'CAD': 0, 'USD': 0},
+                        'gainLoss':   {'CAD': 0, 'USD': 0}};
+  this.report.securityListByType = {'carryChage': [], 'dividend': [], 'interest': [], 'gainLoss': [] };
+
+  // refresh list of securities
+  this.report.securityListByType.carryChage = this.getSecurityListByType(InvestmentType.CARRY_CHARGE);
+  this.report.securityListByType.dividend = this.getSecurityListByType(InvestmentType.DIVIDEND);
+  this.report.securityListByType.interest = this.getSecurityListByType(InvestmentType.INTEREST);
+  this.report.securityListByType.gainLoss = this.getSecurityListByType(InvestmentType.ORDERS);
+
+  // refresh totals
+  var investmentTypes = ['carryChage', 'dividend', 'interest', 'gainLoss'];
+  for (var type in investmentTypes) {
+    type = investmentTypes[type];
+
+    for (var j = 0; j < this.report.securityListByType[type].length; j++) {  
+      var currency = this.report.securityListByType[type][j].security.getAccountCurrency();
+      var amount;
+
+      if (type === 'gainLoss')
+        amount = this.report.securityListByType[type][j].totalGainLoss;
+      else
+        amount = this.report.securityListByType[type][j].amount;
+      
+      this.report.totals[type][currency] += amount;
+    }
+  }
+
   return report;
 }
 
