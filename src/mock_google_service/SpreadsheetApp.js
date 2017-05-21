@@ -9,7 +9,7 @@
  */
 function ActiveSpreadsheet() {}
 
-ActiveSpreadsheet.prototype.getSheetByName = function (sheetName) { return '2011 New'; };
+ActiveSpreadsheet.prototype.getSheetByName = function(sheetName) { return '2011 New'; };
 
 
 /**
@@ -17,7 +17,7 @@ ActiveSpreadsheet.prototype.getSheetByName = function (sheetName) { return '2011
  */
 function ActiveSheet() {}
 
-ActiveSheet.prototype.getRange = function (range) { return new Range(); };
+ActiveSheet.prototype.getRange = function(range) { return new Range(); };
 
 
 /**
@@ -25,7 +25,7 @@ ActiveSheet.prototype.getRange = function (range) { return new Range(); };
  */
 function ArrayLib() {}
 
-ArrayLib.prototype.sort = function (data, columnIndex, ascOrDesc) { return data; };
+ArrayLib.prototype.sort = function(data, columnIndex, ascOrDesc) { return data; };
 
 
 /**
@@ -33,7 +33,7 @@ ArrayLib.prototype.sort = function (data, columnIndex, ascOrDesc) { return data;
  */
 function Range() {}
 
-Range.prototype.getValues = function () {
+Range.prototype.getValues = function() {
   var fs = require('fs');
   var values = null;
 
@@ -43,16 +43,16 @@ Range.prototype.getValues = function () {
 
   return JSON.parse(values);
 };
-
+Range.prototype.setValues = function(values) {}
 
 /**
  * SpreadsheetApp
  */
 function SpreadsheetApp() {}
 
-SpreadsheetApp.prototype.getActiveSheet = function (sheetName) { return new ActiveSheet(); };
-SpreadsheetApp.prototype.getActiveSpreadsheet = function () { return new ActiveSpreadsheet(); };
-SpreadsheetApp.prototype.setActiveSheet = function (sheetName) {};
+SpreadsheetApp.prototype.getActiveSheet = function(sheetName) { return new ActiveSheet(); };
+SpreadsheetApp.prototype.getActiveSpreadsheet = function() { return new ActiveSpreadsheet(); };
+SpreadsheetApp.prototype.setActiveSheet = function(sheetName) {};
 
 
 // Configuration to run on node with mock data
