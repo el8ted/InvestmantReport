@@ -15,7 +15,7 @@ if (typeof process !== 'undefined' && process.release.name === 'node') {
 /**
  * Security class for all transactions. A security is made up of the securityID + account currency
  * @constructor
- * @param {string} accountCurrency, 
+ * @param {string} accountCurrency
  * @param {string} securityID
  */
 function Security(accountCurrency, securityID) {
