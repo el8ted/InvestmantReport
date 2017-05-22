@@ -8,6 +8,7 @@
 "use strict";
 
 var TransactionType = {
+  'TRANSACTION': 'TRANSACTION',
   'INTEREST': 'INTEREST',
   'CARRY_CHARGE': 'CARRY_CHARGE',
   'DIVIDEND': 'DIVIDEND',
@@ -47,9 +48,10 @@ function BaseTransaction(accountCurrency, securityID, tradeDate, amount, usdRate
 }
 
 BaseTransaction.prototype.getAmount = function() { return this.amount; };
-BaseTransaction.prototype.getInvestmentType = function() { return 'TRANSACTION'; };
+BaseTransaction.prototype.getInvestmentType = function() { return 'undefined'; };
 BaseTransaction.prototype.getSecurity = function() { return this.security; };
 BaseTransaction.prototype.getTradeDate = function() { return this.tradeDate; };
+BaseTransaction.prototype.getTransactionType = function() { return 'TRANSACTION'; };
 BaseTransaction.prototype.getUSDRate = function() { return this.usdRate; };
 
 
@@ -80,7 +82,8 @@ function DividendTransaction(accountCurrency, securityID, tradeDate, amount, usd
 DividendTransaction.prototype = Object.create(BaseTransaction.prototype);
 DividendTransaction.prototype.constructor = DividendTransaction;
 DividendTransaction.prototype.getAmountWithheld = function() { return this.amountWithheld; };
-DividendTransaction.prototype.getInvestmentType = function() { return TransactionType.DIVIDEND; };
+DividendTransaction.prototype.getInvestmentType = function() { return InvestmentType.DIVIDEND; };
+DividendTransaction.prototype.getTransactionType = function() { return TransactionType.DIVIDEND; };
 DividendTransaction.prototype.getQuantity = function() { return this.quantity; };
 
 
@@ -99,7 +102,8 @@ function InterestTransaction(accountCurrency, securityID, tradeDate, amount, usd
 
 InterestTransaction.prototype = Object.create(BaseTransaction.prototype);
 InterestTransaction.prototype.constructor = InterestTransaction;
-InterestTransaction.prototype.getInvestmentType = function() { return TransactionType.INTEREST; };
+InterestTransaction.prototype.getInvestmentType = function() { return InvestmentType.INTEREST; };
+InterestTransaction.prototype.getTransactionType = function() { return TransactionType.INTEREST; };
 
 
 /**
@@ -117,7 +121,8 @@ function CarryChargeTransaction(accountCurrency, securityID, tradeDate, amount, 
 
 CarryChargeTransaction.prototype = Object.create(BaseTransaction.prototype);
 CarryChargeTransaction.prototype.constructor = CarryChargeTransaction;
-CarryChargeTransaction.prototype.getInvestmentType = function() { return TransactionType.CARRY_CHARGE; };
+CarryChargeTransaction.prototype.getInvestmentType = function() { return InvestmentType.CARRY_CHARGE; };
+CarryChargeTransaction.prototype.getTransactionType = function() { return TransactionType.CARRY_CHARGE; };
 
 
 /**
@@ -139,9 +144,10 @@ function OrderTransaction(accountCurrency, securityID, tradeDate, amount, usdRat
 
 OrderTransaction.prototype = Object.create(BaseTransaction.prototype);
 OrderTransaction.prototype.constructor = OrderTransaction;
-OrderTransaction.prototype.getInvestmentType = function() { return TransactionType.EQUITY_ORDER; };
-OrderTransaction.prototype.getQuantity = function() { return this.quantity; };
+OrderTransaction.prototype.getInvestmentType = function() { return InvestmentType.ORDER; };
 OrderTransaction.prototype.getMultiplier = function() { return this.multiplier; };
+OrderTransaction.prototype.getQuantity = function() { return this.quantity; };
+OrderTransaction.prototype.getTransactionType = function() { return TransactionType.EQUITY_ORDER; };
 
 
 /**
@@ -163,4 +169,5 @@ function OptionOrderTransaction(accountCurrency, securityID, tradeDate, amount, 
 
 OptionOrderTransaction.prototype = Object.create(OrderTransaction.prototype);
 OptionOrderTransaction.prototype.constructor = OptionOrderTransaction;
-OptionOrderTransaction.prototype.getInvestmentType = function() { return TransactionType.OPTION_ORDER; };
+OptionOrderTransaction.prototype.getInvestmentType = function() { return InvestmentType.ORDER; };
+OptionOrderTransaction.prototype.getTransactionType = function() { return TransactionType.OPTION_ORDER; };

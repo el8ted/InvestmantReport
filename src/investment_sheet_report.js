@@ -93,7 +93,7 @@ InvestmentSheetReport.prototype.refreshReport = function() {
   this.report.securityListByType.carryCharge = this.getSecurityListByType(InvestmentType.CARRY_CHARGE);
   this.report.securityListByType.dividend = this.getSecurityListByType(InvestmentType.DIVIDEND);
   this.report.securityListByType.interest = this.getSecurityListByType(InvestmentType.INTEREST);
-  this.report.securityListByType.gainLoss = this.getSecurityListByType(InvestmentType.ORDERS);
+  this.report.securityListByType.gainLoss = this.getSecurityListByType(InvestmentType.ORDER);
 
   // refresh totals
   var investmentTypes = ['carryCharge', 'dividend', 'interest', 'gainLoss'];
