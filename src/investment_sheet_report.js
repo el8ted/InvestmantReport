@@ -1,6 +1,9 @@
 /**
- * Created by Tom on 2017-05-14.
- * Class to interact with putting data into report of the active sheet
+ * @license MIT
+ *
+ * @fileoverview Class to interact with putting data into report of the active sheet
+ *
+ * @author tomek32@gmail.com Tom Hosiawa
  */
 "use strict";
 
@@ -63,16 +66,16 @@ InvestmentSheetReport.prototype.getSecurityListByType = function (type) {
     if (securities.hasOwnProperty(securityKey))
       switch (type) {
         case InvestmentType.CARRY_CHARGE:
-          report.push(this.investmentsAccount.getCarryChargeBySecurity(securities[securityKey]));
+          report.push(this.investmentsAccount.getTotalCarryChargeBySecurity(securities[securityKey]));
           break;
         case InvestmentType.DIVIDEND:
-          report.push(this.investmentsAccount.getDividendBySecurity(securities[securityKey]));
+          report.push(this.investmentsAccount.getTotalDividendBySecurity(securities[securityKey]));
           break;
         case InvestmentType.INTEREST:
-          report.push(this.investmentsAccount.getInterestBySecurity(securities[securityKey]));
+          report.push(this.investmentsAccount.getTotalInterestBySecurity(securities[securityKey]));
           break;
         case InvestmentType.ORDERS:
-          report.push(this.investmentsAccount.getRealizedGainLossBySecurity(securities[securityKey]));
+          report.push(this.investmentsAccount.getTotalRealizedGainLossBySecurity(securities[securityKey]));
       }
 
   return report;
