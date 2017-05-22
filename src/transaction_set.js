@@ -44,7 +44,7 @@ TransactionSet.prototype.addTransaction = function(transaction) {
  */
 TransactionSet.prototype.getTransactions = function(type, security) {
   if (typeof InvestmentType[type] === 'undefined') {
-    throw "TransactionSet.getTransactions: invalid type"
+    throw 'TransactionSet.getTransactions: invalid type'
   }
 
   if (typeof security === 'undefined') {
@@ -69,7 +69,7 @@ TransactionSet.prototype.getTransactions = function(type, security) {
  */
 TransactionSet.prototype.getUniqueSecurities = function(type) {
   if (typeof InvestmentType[type] === 'undefined') {
-    throw "TransactionSet.getUniqueSecurities: invalid type"
+    throw 'TransactionSet.getUniqueSecurities: invalid type'
   }
 
   var list = {'UIDs': [], 'securities': []};

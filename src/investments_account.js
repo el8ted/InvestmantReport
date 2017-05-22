@@ -119,7 +119,7 @@ InvestmentsAccount.prototype.getTotalRealizedGainLossBySecurity = function (secu
  */
 InvestmentsAccount.prototype.getUniqueSecurities = function(type) {
   if (typeof InvestmentType[type] === 'undefined') {
-    throw "InvestmentsAccount.getUniqueSecurities: invalid type"
+    throw 'InvestmentsAccount.getUniqueSecurities: invalid type'
   }
 
   return this.transactionsSet.getUniqueSecurities(type);
@@ -133,7 +133,7 @@ InvestmentsAccount.prototype.getUniqueSecurities = function(type) {
  */
 function getIncomeOrCarryAmountBySecurity(investmentAccount, type, security) {
   if (typeof InvestmentType[type] === 'undefined' || type === InvestmentType.ORDER)  {
-    throw "InvestmentsAccount.getIncomeOrCarryAmountByBySecurity: invalid type"
+    throw 'InvestmentsAccount.getIncomeOrCarryAmountByBySecurity: invalid type'
   }
 
   var transactions = investmentAccount.transactionsSet.getTransactions(type, security);
