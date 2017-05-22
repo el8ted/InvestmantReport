@@ -120,3 +120,19 @@ InvestmentSheetReport.prototype.refreshReport = function() {
 
   return this.report;
 };
+
+/**
+ * Writes report to active sheet
+ * @param {InvestmentSheetReport} investmentSheetReport
+ */
+var writeReportToActiveSheet = function (investmentSheetReport) {
+  var report = investmentSheetReport.getReport();
+  var arrayTotals = [['Investment Type',      'CAD',                         'USD'],
+                     ['Carry Charge',         report.totals.carryCharge.CAD, report.totals.carryCharge.USD],
+                     ['Interest',             report.totals.interest.CAD,    report.totals.interest.USD],
+                     ['Dividends',            report.totals.dividend.CAD,    report.totals.dividend.USD],
+                     ['Realized Gain & Loss', report.totals.gainLoss.CAD,    report.totals.gainLoss.USD]];
+
+  SpreadsheetApp.setActiveSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName("2011 New")); //TODO: For debug mode only
+  var sheet = SpreadsheetApp.getActiveSheet().getRange("K2:M6").setValues(arrayTotals);
+};

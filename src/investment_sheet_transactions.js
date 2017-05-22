@@ -12,6 +12,7 @@ if (typeof process !== 'undefined' && process.release.name === 'node') {
   var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
   var ArrayLib = new SpreadSheetAppModule.ArrayLib();
 
+  var InvestmentSheetReport = require('./investment_sheet_report.js').InvestmentSheetReport;
   var Security = require('./security.js').Security;
   var TransactionModule = require('./transaction.js');
   var BaseTransaction = TransactionModule.BaseTransaction;
@@ -20,8 +21,6 @@ if (typeof process !== 'undefined' && process.release.name === 'node') {
   var CarryChargeTransaction = TransactionModule.CarryChargeTransaction;
   var OrderTransaction = TransactionModule.OrderTransaction;
   var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
-
-  var InvestmentSheetReport = require('./investment_sheet_report.js').InvestmentSheetReport;
 
   function node_init() {
     main();
@@ -153,24 +152,9 @@ function main() {
   var investmentSheetReport = new InvestmentSheetReport();
 
   var sheetTransactions = loadAllTransactionsFromActiveSheet();
-  for (var k = 0; k < sheetTransactions.length; k++)
+  for (var k = 0; k < sheetTransactions.length; k++) {
     addTransaction(investmentSheetReport, sheetTransactions[k]);
+  }
 
-  writeReportToActiveSheet(investmentSheetReport);
+  investmentSheetReport.writeReportToActiveSheet(investmentSheetReport);
 }
-
-/**
- * Writes report to active sheet
- * @param {InvestmentSheetReport} investmentSheetReport
- */
-var writeReportToActiveSheet = function (investmentSheetReport) {
-  var report = investmentSheetReport.getReport();
-  var arrayTotals = [['Investment Type',      'CAD',                         'USD'],
-                     ['Carry Charge',         report.totals.carryCharge.CAD, report.totals.carryCharge.USD],
-                     ['Interest',             report.totals.interest.CAD,    report.totals.interest.USD],
-                     ['Dividends',            report.totals.dividend.CAD,    report.totals.dividend.USD],
-                     ['Realized Gain & Loss', report.totals.gainLoss.CAD,    report.totals.gainLoss.USD]];
-
-  SpreadsheetApp.setActiveSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName("2011 New")); //TODO: For debug mode only
-  var sheet = SpreadsheetApp.getActiveSheet().getRange("K2:M6").setValues(arrayTotals);
-};
