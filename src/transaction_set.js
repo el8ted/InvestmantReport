@@ -23,7 +23,7 @@ function TransactionSet() {
   this.transactionsList = {};
 
   for (var key in InvestmentType) {
-    InvestmentType[key] = [];
+    this.transactionsList[key] = [];
   }
 }
 
