@@ -1,66 +1,89 @@
 /**
- * Created by Tom on 2017-05-13.
- * Mock of Google's Spreadsheet services
+ * @license MIT
+ *
+ * @fileoverview  Mock of Google's Sheets APIs required by InvestmentReport
+ *
+ * @author tomek32@gmail.com Tom Hosiawa
  */
 "use strict";
 
+module.exports.ActiveSpreadsheet = ActiveSpreadsheet;
+module.exports.ActiveSheet = ActiveSheet;
+module.exports.ArrayLib = ArrayLib;
+module.exports.Range = Range;
+module.exports.SpreadsheetApp = SpreadsheetApp;
+
+
 /**
- * ActiveSpreadsheet
+ * @constructor
  */
 function ActiveSpreadsheet() {}
 
+/**
+ * @param {string} sheetName
+ * @returns {string}
+ */
 ActiveSpreadsheet.prototype.getSheetByName = function(sheetName) { return '2011 New'; };
 
 
 /**
- * ActiveSheet
+ *  @constructor
  */
 function ActiveSheet() {}
 
+/**
+ * @param {string} range
+ * @returns {Range}
+ */
 ActiveSheet.prototype.getRange = function(range) { return new Range(); };
 
 
 /**
- * ArrayLib
+ *  @constructor
  */
 function ArrayLib() {}
 
+/**
+ * @param {Array<data><data>} data
+ * @param {number} columnIndex
+ * @param {string} ascOrDesc
+ * @returns {Array<data><data>}
+ */
 ArrayLib.prototype.sort = function(data, columnIndex, ascOrDesc) { return data; };
 
 
 /**
- * Range
+ *  @constructor
  */
 function Range() {}
 
+/**
+ * @return {Array<data><data>}
+ */
 Range.prototype.getValues = function() {
   var fs = require('fs');
   var values = null;
 
   try {
     values = fs.readFileSync('./resources/range_values.txt', 'utf8');
-  } catch (e) { throw e; }
+  } catch (e) {
+    throw e;
+  }
 
   return JSON.parse(values);
 };
-Range.prototype.setValues = function(values) {}
 
 /**
- * SpreadsheetApp
+ * @param {Array<values><values>} values
+ */
+Range.prototype.setValues = function(values) {};
+
+
+/**
+ * @constructor
  */
 function SpreadsheetApp() {}
 
 SpreadsheetApp.prototype.getActiveSheet = function(sheetName) { return new ActiveSheet(); };
 SpreadsheetApp.prototype.getActiveSpreadsheet = function() { return new ActiveSpreadsheet(); };
 SpreadsheetApp.prototype.setActiveSheet = function(sheetName) {};
-
-
-// Configuration to run on node with mock data
-global.RUN_ON_NODE = true;
-if (global.RUN_ON_NODE) {
-  module.exports.ActiveSpreadsheet = ActiveSpreadsheet;
-  module.exports.ActiveSheet = ActiveSheet;
-  module.exports.ArrayLib = ArrayLib;
-  module.exports.Range = Range;
-  module.exports.SpreadsheetApp = SpreadsheetApp;
-}
