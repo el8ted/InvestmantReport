@@ -20,7 +20,11 @@ if (typeof process !== 'undefined' && process.release.name === 'node') {
  * @constructor
  */
 function TransactionSet() {
-  this.transactionsList = {'INTEREST': [], 'CARRY_CHARGE': [], 'DIVIDEND': [], 'ORDER': [], 'OPTION_ORDER': []};
+  this.transactionsList = {};
+
+  for (var key in InvestmentType) {
+    InvestmentType[key] = [];
+  }
 }
 
 /**
@@ -32,11 +36,15 @@ TransactionSet.prototype.addTransaction = function(transaction) {
 
 /**
  * @param {InvestmentType} type
- * @param {Security} security optional
- * @returns {Array<OrderTransaction>} returns array matching type. if security is specified, returns transactions matching
+ * @param {Security=} security optional
+ * @returns {OrderTransaction[]} returns array matching type. if security is specified, returns transactions matching
  *                                    only type + security
  */
 TransactionSet.prototype.getTransactions = function(type, security) {
+  if (typeof InvestmentType[type] === 'undefined') {
+    throw "TransactionSet.getTransactions: invalid type"
+  }
+
   if (typeof security === 'undefined') {
     return this.transactionsList[type];
   }
@@ -55,9 +63,13 @@ TransactionSet.prototype.getTransactions = function(type, security) {
 
 /**
  * @param {InvestmentType} type
- * @returns {Array<Security>} unique array of securities matching the investment type
+ * @returns {Security[]} unique array of securities matching the investment type
  */
 TransactionSet.prototype.getUniqueSecurities = function(type) {
+  if (typeof InvestmentType[type] === 'undefined') {
+    throw "TransactionSet.getUniqueSecurities: invalid type"
+  }
+
   var list = {'UIDs': [], 'securities': []};
 
   for (var i = 0, length = this.transactionsList[type].length ; i < length ; i++) {

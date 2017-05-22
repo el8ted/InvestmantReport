@@ -27,7 +27,7 @@ ActiveSpreadsheet.prototype.getSheetByName = function(sheetName) { return '2011 
 
 
 /**
- *  @constructor
+ * @constructor
  */
 function ActiveSheet() {}
 
@@ -44,7 +44,7 @@ ActiveSheet.prototype.getRange = function(range) { return new Range(); };
 function ArrayLib() {}
 
 /**
- * @param {Array<data><data>} data
+ * @param {data[][]} data
  * @param {number} columnIndex
  * @param {string} ascOrDesc
  * @returns {Array<data><data>}
@@ -53,12 +53,12 @@ ArrayLib.prototype.sort = function(data, columnIndex, ascOrDesc) { return data; 
 
 
 /**
- *  @constructor
+ * @constructor
  */
 function Range() {}
 
 /**
- * @return {Array<data><data>}
+ * @returns {data[][]}
  */
 Range.prototype.getValues = function() {
   const fs = require('fs');
@@ -74,7 +74,7 @@ Range.prototype.getValues = function() {
 };
 
 /**
- * @param {Array<values><values>} values
+ * @param {values[][]} values
  */
 Range.prototype.setValues = function(values) {};
 

@@ -94,7 +94,7 @@ DividendTransaction.prototype.getQuantity = function() { return this.quantity; }
  * @param  {string} securityID
  * @param  {string} tradeDate
  * @param  {number} amount
- * @param  {number} usdRate optional
+ * @param  {number=} usdRate optional
  */
 function InterestTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
   BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
@@ -113,7 +113,7 @@ InterestTransaction.prototype.getTransactionType = function() { return Transacti
  * @param  {string} securityID
  * @param  {string} tradeDate
  * @param  {number} amount
- * @param  {number} usdRate optional
+ * @param  {number=} usdRate optional
  */
 function CarryChargeTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
   BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
@@ -133,8 +133,8 @@ CarryChargeTransaction.prototype.getTransactionType = function() { return Transa
  * @param  {string} securityID
  * @param  {string} tradeDate
  * @param  {number} amount net amount of order (after commission)
- * @param  {number} usdRate optional
- * @param  {number} quantity optional
+ * @param  {number=} usdRate optional
+ * @param  {number=} quantity optional
  */
 function OrderTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity) {
   BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
@@ -158,9 +158,9 @@ OrderTransaction.prototype.getTransactionType = function() { return TransactionT
  * @param  {string} securityID
  * @param  {string} tradeDate
  * @param  {number} amount net amount of order (after commission)
- * @param  {number} usdRate optional
+ * @param  {number=} usdRate optional
  * @param  {number} quantity
- * @param  {number} multiplier optional
+ * @param  {number=} multiplier optional
  */
 function OptionOrderTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity, multiplier) {
   OrderTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate, quantity);
