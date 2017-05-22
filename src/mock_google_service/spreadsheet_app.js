@@ -74,6 +74,16 @@ Range.prototype.getValues = function() {
 };
 
 /**
+ * @param {number} rowOffset
+ * @param {number} columnOffset
+ */
+Range.prototype.offset = function (rowOffset, columnOffset) {
+  if (columnOffset === 3) {
+   return 'K2:N6'
+  }
+};
+
+/**
  * @param {values[][]} values
  */
 Range.prototype.setValues = function(values) {};

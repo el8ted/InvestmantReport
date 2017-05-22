@@ -109,7 +109,9 @@ var addTransaction = function (investmentSheetReport, transaction) {
  * @return {SheetConfig.DataColumns[]} returns list of transactions. sorted from oldest to nearest (i.e. jan - dec)
  */
 var loadAllTransactionsFromActiveSheet = function () {
-  var sheetTransactions = SpreadsheetApp.getActiveSheet().getRange(SheetConfig.DataRange).getValues();
+  var sheetTransactions = SpreadsheetApp.getActiveSheet()
+      .getRange(SheetConfig.DataRange)
+      .getValues();
 
   // Remove header row
   sheetTransactions.splice(0, 1);

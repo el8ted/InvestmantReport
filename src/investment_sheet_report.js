@@ -17,9 +17,36 @@ if (typeof process !== 'undefined' && process.release.name === 'node') {
 }
 
 var SheetConfig = {
-  totalsStartCell: 'K1',
-  securityListByTypeStartCell: 'K9',
-  securityListByTypeColumns: {'REPORT_TYPE': 0, 'SECURITY_ID': 1, 'AMOUNT': 2, 'GAIN_LOSS': 3, 'QUANTITY': 4, 'ACB': 5 }
+  totalsSection : {
+    topLeftCell: 'K1',
+    headerLabels: {},
+  },
+  securitiesSection: {
+    topLeftCell: 'K9',
+    headerLabels: {}
+  }
+};
+headerLabels: ['Investment Type', 'CAD', 'USD', 'Total'],
+
+SheetConfig.rowLabels[InvestmentType.CARRY_CHARGE] = 'Carry Charge';
+SheetConfig.rowLabels[InvestmentType.DIVIDEND] = 'Dividend';
+SheetConfig.rowLabels[InvestmentType.INTEREST] = 'Interest';
+SheetConfig.rowLabels[InvestmentType.ORDER] = 'Realized Gain / Loss';
+
+
+columnHeaders: ['Security', 'Amount', 'Gain / Loss', 'Quantity', 'ACB'],
+var ReportTotalColumn = {
+  'INVESTMENT_TYPE': 'INVESTMENT_TYPE',
+  'TOTAL_CAD': 'TOTAL_CAD', 
+  'TOTAL_USD': 'TOTAL_USD',
+  'TOTAL': 'TOTAL'
+};
+var ReportSecuritiesColumn = {
+  'SECURITY': 'SECURITY',
+  'AMOUNT': 'AMOUNT', 
+  'REALIZED_GAIN_LOSSD': 'REALIZED_GAIN_LOSSD',
+  'REMAINING_QUANTITY': 'REMAINING_QUANTITY',
+  'ACB': 'ACB'
 };
 
 /**
@@ -27,14 +54,25 @@ var SheetConfig = {
  */
 function InvestmentSheetReport() {
   this.investmentsAccount = new InvestmentsAccount();
-  this.report = {'totals': null, 'securityListByType': null};
+  this.report = {'totals': null, 'securities': null};
 }
 
 /**
- * @param  {BaseTransaction} transaction
+ * @param {BaseTransaction} transaction
  */
 InvestmentSheetReport.prototype.addTransaction = function(transaction) {
   this.investmentsAccount.addTransaction(transaction);
+};
+
+/**
+ * Writes report to active sheet using configuration in SheetConfig
+ * @param {InvestmentSheetReport} investmentSheetReport
+ */
+InvestmentSheetReport.prototype.writeReportToActiveSheet = function(investmentSheetReport) {
+  refreshReport();
+
+  writeTotalsSectionToActiveSheet();
+  //writeSecuritiesSection();
 };
 
 /**
@@ -47,23 +85,38 @@ InvestmentSheetReport.prototype.addTransaction = function(transaction) {
  *                           interest:    [{Security}, amount: {Number}],
  *                           gainLoss:    [{Security}, gainLoss: {Number}, quantity: {Number}, ACB: {Number}]}}
  */
-InvestmentSheetReport.prototype.getReport = function() {
-  this.refreshReport();
-  return this.report;
+function writeTotalsSectionToActiveSheet() {
+  // Build array
+  var arrayTotals = SheetConfig.totalsSection.headerLabels;
+  for (var j = 0, length = report.totals.length; j < length; j++) {
+    total = [
+      SheetConfig.totalsSection.rowLabels[report.totals[j]],
+      report.totals[j].CAD,
+      report.totals[j].USD,
+      report.totals[j].Total
+    ]
+  }
+
+  var range = SpreadsheetApp.getActiveSheet()
+      .getRange(SheetConfig.totalsSection.topLeftCell)
+      .offset(report.totals.length, SheetConfig.totalsSection.headerLabels.length);
+  SpreadsheetApp.getActiveSheet()
+      .getRange(range)
+      .setValues(arrayTotals);
 };
 
 /**
  * @param {InvestmentType} type
  * @returns  {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
  */
-InvestmentSheetReport.prototype.getSecurityListByType = function (type) {
+function getSecurityListByType(type)  {
   var securities = this.investmentsAccount.getUniqueSecurities(type);
   var securityKey;
   var report = [];
 
   // TODO: add option order transaction
-  for (securityKey in securities)
-    if (securities.hasOwnProperty(securityKey))
+  for (securityKey in securities) {
+    if (securities.hasOwnProperty(securityKey)) {
       switch (type) {
         case InvestmentType.CARRY_CHARGE:
           report.push(this.investmentsAccount.getTotalCarryChargeBySecurity(securities[securityKey]));
@@ -76,7 +129,10 @@ InvestmentSheetReport.prototype.getSecurityListByType = function (type) {
           break;
         case InvestmentType.ORDERS:
           report.push(this.investmentsAccount.getTotalRealizedGainLossBySecurity(securities[securityKey]));
+        default:
       }
+    }
+  }
 
   return report;
 };
@@ -84,19 +140,19 @@ InvestmentSheetReport.prototype.getSecurityListByType = function (type) {
 /**
  * @returns {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
  */
-InvestmentSheetReport.prototype.refreshReport = function() {
+function refreshReport() {
   // TODO: refactor this function
   this.report.totals = {'carryCharge': {'CAD': 0, 'USD': 0},
                         'dividend':   {'CAD': 0, 'USD': 0},
                         'interest':   {'CAD': 0, 'USD': 0},
                         'gainLoss':   {'CAD': 0, 'USD': 0}};
-  this.report.securityListByType = {'carryCharge': [], 'dividend': [], 'interest': [], 'gainLoss': [] };
+  this.report.securities = {'carryCharge': [], 'dividend': [], 'interest': [], 'gainLoss': [] };
 
   // refresh list of securities
-  this.report.securityListByType.carryCharge = this.getSecurityListByType(InvestmentType.CARRY_CHARGE);
-  this.report.securityListByType.dividend = this.getSecurityListByType(InvestmentType.DIVIDEND);
-  this.report.securityListByType.interest = this.getSecurityListByType(InvestmentType.INTEREST);
-  this.report.securityListByType.gainLoss = this.getSecurityListByType(InvestmentType.ORDER);
+  this.report.securities.carryCharge = this.getSecurityListByType(InvestmentType.CARRY_CHARGE);
+  this.report.securities.dividend = this.getSecurityListByType(InvestmentType.DIVIDEND);
+  this.report.securities.interest = this.getSecurityListByType(InvestmentType.INTEREST);
+  this.report.securities.gainLoss = this.getSecurityListByType(InvestmentType.ORDER);
 
   // refresh totals
   var investmentTypes = ['carryCharge', 'dividend', 'interest', 'gainLoss'];
@@ -104,14 +160,14 @@ InvestmentSheetReport.prototype.refreshReport = function() {
     if (investmentTypes.hasOwnProperty(type)) {
       var typeValue = investmentTypes[type];
 
-      for (var j = 0; j < this.report.securityListByType[typeValue].length; j++) {
-        var currency = this.report.securityListByType[typeValue][j].security.getAccountCurrency();
+      for (var j = 0; j < this.report.securities[typeValue].length; j++) {
+        var currency = this.report.securities[typeValue][j].security.getAccountCurrency();
         var amount;
 
         if (type === 'gainLoss')
-          amount = this.report.securityListByType[typeValue][j].totalGainLoss;
+          amount = this.report.securities[typeValue][j].totalGainLoss;
         else
-          amount = this.report.securityListByType[typeValue][j].amount;
+          amount = this.report.securities[typeValue][j].amount;
 
         this.report.totals[typeValue][currency] += amount;
       }
@@ -119,20 +175,4 @@ InvestmentSheetReport.prototype.refreshReport = function() {
   }
 
   return this.report;
-};
-
-/**
- * Writes report to active sheet
- * @param {InvestmentSheetReport} investmentSheetReport
- */
-var writeReportToActiveSheet = function (investmentSheetReport) {
-  var report = investmentSheetReport.getReport();
-  var arrayTotals = [['Investment Type',      'CAD',                         'USD'],
-                     ['Carry Charge',         report.totals.carryCharge.CAD, report.totals.carryCharge.USD],
-                     ['Interest',             report.totals.interest.CAD,    report.totals.interest.USD],
-                     ['Dividends',            report.totals.dividend.CAD,    report.totals.dividend.USD],
-                     ['Realized Gain & Loss', report.totals.gainLoss.CAD,    report.totals.gainLoss.USD]];
-
-  SpreadsheetApp.setActiveSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName("2011 New")); //TODO: For debug mode only
-  var sheet = SpreadsheetApp.getActiveSheet().getRange("K2:M6").setValues(arrayTotals);
 };
