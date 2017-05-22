@@ -47,22 +47,22 @@ var addTransaction = function (investmentSheetReport, transaction) {
       (transaction[SheetConfig.DataColumns.DIVIDEND]) === '') {
 
         if (transaction[SheetConfig.DataColumns.AMOUNT] >= 0) {
-          var transaction = new InterestTransaction(
+          var interest = new InterestTransaction(
               transaction[SheetConfig.DataColumns.ACCOUNT],
               transaction[SheetConfig.DataColumns.SECURITY_ID],
               transaction[SheetConfig.DataColumns.TRADE_DATE],
               transaction[SheetConfig.DataColumns.AMOUNT],
               transaction[SheetConfig.DataColumns.USD_RATE]);
-          investmentSheetReport.addTransaction(transaction);
+          investmentSheetReport.addTransaction(interest);
         }
         else {
-          var transaction = new CarryChargeTransaction(
+          var carryCharge = new CarryChargeTransaction(
               transaction[SheetConfig.DataColumns.ACCOUNT],
               transaction[SheetConfig.DataColumns.SECURITY_ID],
               transaction[SheetConfig.DataColumns.TRADE_DATE],
               transaction[SheetConfig.DataColumns.AMOUNT],
               transaction[SheetConfig.DataColumns.USD_RATE]);
-          investmentSheetReport.addTransaction(transaction);
+          investmentSheetReport.addTransaction(carryCharge);
           
           return;
         }
@@ -83,7 +83,7 @@ var addTransaction = function (investmentSheetReport, transaction) {
     if ((transaction[SheetConfig.DataColumns.SECURITY_ID].slice(5) === 'CALL-') ||
         (transaction[SheetConfig.DataColumns.SECURITY_ID].slice(5) === 'PUT-')) {
       // TODO: remove hard coding of multiplier
-      var order = new OptionOrderTransaction(
+      var optionOrder = new OptionOrderTransaction(
           transaction[SheetConfig.DataColumns.ACCOUNT],
           transaction[SheetConfig.DataColumns.SECURITY_ID],
           transaction[SheetConfig.DataColumns.TRADE_DATE],
@@ -91,7 +91,7 @@ var addTransaction = function (investmentSheetReport, transaction) {
           transaction[SheetConfig.DataColumns.USD_RATE],
           transaction[SheetConfig.DataColumns.QUANTITY],
           100);
-      investmentSheetReport.addTransaction(order);
+      investmentSheetReport.addTransaction(optionOrder);
     }
     else {
       var order = new OrderTransaction(
