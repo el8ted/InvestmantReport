@@ -1,12 +1,13 @@
 /**
  * @license MIT
  *
- * @fileoverview Class that holds transactions and categories them by investment type
+ * @fileoverview Class that holds transactions and categorizes them by investment type
  *
  * @author tomek32@gmail.com Tom Hosiawa
  */
 "use strict";
 
+// Configuration to run on node with mock data
 if (typeof process !== 'undefined' && process.release.name === 'node') {
   var InvestmentType = require('./investment_type.js').InvestmentType;
 
@@ -32,7 +33,8 @@ TransactionSet.prototype.addTransaction = function(transaction) {
 /**
  * @param {InvestmentType} type
  * @param {Security} security optional
- * @returns {Array<OrderTransaction>} returns array matching type. if security is specified, returns only type + security
+ * @returns {Array<OrderTransaction>} returns array matching type. if security is specified, returns transactions matching
+ *                                    only type + security
  */
 TransactionSet.prototype.getTransactions = function(type, security) {
   if (typeof security === 'undefined') {
