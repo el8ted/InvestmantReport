@@ -61,7 +61,7 @@ function Range() {}
  * @return {Array<data><data>}
  */
 Range.prototype.getValues = function() {
-  var fs = require('fs');
+  const fs = require('fs');
   var values = null;
 
   try {

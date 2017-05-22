@@ -1,18 +1,29 @@
 /**
- * Created by Tom on 2017-05-01.
+ * @license MIT
+ *
+ * @fileoverview Class that holds transactions and categories them by investment type
+ *
+ * @author tomek32@gmail.com Tom Hosiawa
  */
 "use strict";
-var RUN_ON_NODE = true;
+
+if (typeof process !== 'undefined' && process.release.name === 'node') {
+  var InvestmentType = require('./investment_type.js').InvestmentType;
+
+  module.exports.TransactionSet = TransactionSet;
+}
+
 
 /**
  * Class to hold list of transactions, categorized by investment type
+ * @constructor
  */
 function TransactionSet() {
   this.transactionsList = {'INTEREST': [], 'CARRY_CHARGE': [], 'DIVIDEND': [], 'ORDER': [], 'OPTION_ORDER': []};
 }
 
 /**
- * @param {Parent of BaseTransaction} transaction
+ * @param {BaseTransaction} transaction
  */
 TransactionSet.prototype.addTransaction = function(transaction) {
   this.transactionsList[transaction.getInvestmentType()].push(transaction);
@@ -20,36 +31,36 @@ TransactionSet.prototype.addTransaction = function(transaction) {
 
 /**
  * @param {InvestmentType} type
- * @param {Security} security - optional
- * @returns {[OrderTransaction]]} returns array matching type. if security is specified, returns only type + security
+ * @param {Security} security optional
+ * @returns {Array<OrderTransaction>} returns array matching type. if security is specified, returns only type + security
  */
 TransactionSet.prototype.getTransactions = function(type, security) {
-  var transactions = [];
-
-  if (typeof security === 'undefined')
+  if (typeof security === 'undefined') {
     return this.transactionsList[type];
+  }
   else {
-    for (var i = 0; i < this.transactionsList[type].length; i++) {
-      if (security.getUID() === this.transactionsList[type][i].getSecurity().getUID())
+    var transactions = [];
+
+    for (var i = 0, length = this.transactionsList[type].length; i < length; i++) {
+      if (security.getUID() === this.transactionsList[type][i].getSecurity().getUID()) {
         transactions.push(this.transactionsList[type][i]);
-    };
+      }
+    }
   }
 
   return transactions;
 };
 
 /**
- * @param {InvestmentType}
- * @returns {[Security]} unique list matching the investment type
+ * @param {InvestmentType} type
+ * @returns {Array<Security>} unique array of securities matching the investment type
  */
-TransactionSet.prototype.getUniqueSecurities = function (type) {
+TransactionSet.prototype.getUniqueSecurities = function(type) {
   var list = {'UIDs': [], 'securities': []};
-  var UID;
 
-  for (var i = 0; i < this.transactionsList[type].length; i++) {
+  for (var i = 0, length = this.transactionsList[type].length ; i < length ; i++) {
     var security = this.transactionsList[type][i].getSecurity();
-    //UID = null;
-    UID = security.getUID();
+    var UID = security.getUID();
 
     if (list.UIDs.indexOf(UID) === -1) {
       list.UIDs.push(UID);
@@ -59,11 +70,3 @@ TransactionSet.prototype.getUniqueSecurities = function (type) {
 
   return list.securities;
 };
-
-
-// Configuration to run on node with mock data
-if (RUN_ON_NODE) {
-  var InvestmentType = require('./investment_type.js').InvestmentType;
-
-  module.exports.TransactionSet = TransactionSet;
-}
