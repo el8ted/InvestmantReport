@@ -1,6 +1,9 @@
 /**
- * Created by Tom on 2017-05-01.
- * Class to interact with getting data from active sheet and put report in the same active sheet
+ * @license MIT
+ *
+ * @fileoverview Supported investment types
+ *
+ * @author tomek32@gmail.com Tom Hosiawa
  */
 "use strict";
 
