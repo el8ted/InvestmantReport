@@ -1,7 +1,7 @@
 /**
  * @license MIT
  *
- * @fileoverview  Mock of Google's Sheets APIs required by InvestmentReport
+ * @fileoverview Mock of Google's Sheets APIs required by InvestmentReport
  *
  * @author tomek32@gmail.com Tom Hosiawa
  */

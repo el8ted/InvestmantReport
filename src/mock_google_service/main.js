@@ -1,7 +1,7 @@
 /**
  * @license MIT
  *
- * @fileoverview  Simulates google sheets launching the main program
+ * @fileoverview Simulates google sheets launching the main program
  *
  * @author tomek32@gmail.com Tom Hosiawa
  */
