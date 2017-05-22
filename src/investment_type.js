@@ -3,7 +3,6 @@
  * Class to interact with getting data from active sheet and put report in the same active sheet
  */
 "use strict";
-global.RUN_ON_NODE = true;
 
 var InvestmentType = {
   'INTEREST': 'INTEREST',
@@ -12,8 +11,7 @@ var InvestmentType = {
   'ORDERS': 'ORDER'
 };
 
-
 // Configuration to run on node with mock data
-if (global.RUN_ON_NODE) {
+if (typeof process !== 'undefined' && process.release.name === 'node') {
   module.exports.InvestmentType = InvestmentType;
 }

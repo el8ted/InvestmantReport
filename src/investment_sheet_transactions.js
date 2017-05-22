@@ -3,9 +3,30 @@
  * Class to interact with getting data from active sheet and put report in the same active sheet
  */
 "use strict";
-if (global === undefined)
-  var global = {};
-global.RUN_ON_NODE = true;
+
+// Configuration to run on node with mock data
+if (typeof process !== 'undefined' && process.release.name === 'node') {
+  var SpreadSheetAppModule = require('./mock_google_service/spreadsheet_app.js');
+  var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
+  var ArrayLib = new SpreadSheetAppModule.ArrayLib();
+
+  var Security = require('./security.js').Security;
+  var TransactionModule = require('./transaction.js');
+  var BaseTransaction = TransactionModule.BaseTransaction;
+  var DividendTransaction = TransactionModule.DividendTransaction;
+  var InterestTransaction = TransactionModule.InterestTransaction;
+  var CarryChargeTransaction = TransactionModule.CarryChargeTransaction;
+  var OrderTransaction = TransactionModule.OrderTransaction;
+  var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
+
+  var InvestmentSheetReport = require('./investment_sheet_report.js').InvestmentSheetReport;
+
+  function node_init() {
+    main();
+  }
+
+  module.exports = node_init;
+}
 
 
 var SheetConfig = {
@@ -135,27 +156,3 @@ var writeReportToActiveSheet = function (investmentSheetReport) {
   SpreadsheetApp.setActiveSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName("2011 New")); //TODO: For debug mode only
   var sheet = SpreadsheetApp.getActiveSheet().getRange("K2:M6").setValues(arrayTotals);
 };
-
-// Configuration to run on node with mock data
-if (global.RUN_ON_NODE) {
-  var SpreadSheetAppModule = require('./mock_google_service/spreadsheet_app.js');
-  var SpreadsheetApp = new SpreadSheetAppModule.SpreadsheetApp();
-  var ArrayLib = new SpreadSheetAppModule.ArrayLib();
-
-  var Security = require('./security.js').Security;
-  var TransactionModule = require('./transaction.js');
-  var BaseTransaction = TransactionModule.BaseTransaction;
-  var DividendTransaction = TransactionModule.DividendTransaction;
-  var InterestTransaction = TransactionModule.InterestTransaction;
-  var CarryChargeTransaction = TransactionModule.CarryChargeTransaction;
-  var OrderTransaction = TransactionModule.OrderTransaction;
-  var OptionOrderTransaction = TransactionModule.OptionOrderTransaction;
-  
-  var InvestmentSheetReport = require('./investment_sheet_report.js').InvestmentSheetReport;
-  
-  function node_init() {
-    main();
-  }
-  
-  module.exports = node_init;
-}

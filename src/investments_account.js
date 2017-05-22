@@ -1,8 +1,19 @@
 /**
- * Created by Tom on 2017-05-01.
+ * @license MIT
+ *
+ * @fileoverview Class to hold investment transactions and process queries on them
+ *
+ * @author tomek32@gmail.com Tom Hosiawa
  */
 "use strict";
-global.RUN_ON_NODE = true;
+
+// Configuration to run on node with mock data
+if (typeof process !== 'undefined' && process.release.name === 'node') {
+  var TransactionSet = require('./transaction_set.js').TransactionSet;
+  var InvestmentType = require('./investment_type.js').InvestmentType;
+
+  module.exports = InvestmentsAccount;
+}
 
 
 /**
@@ -13,7 +24,7 @@ function InvestmentsAccount() {
 }
 
 /**
- * @param {Parent of BaseTransaction} transaction
+ * @param {BaseTransaction} transaction
  */
 InvestmentsAccount.prototype.addTransaction = function (transaction) {
   this.transactionsSet.addTransaction(transaction);
@@ -53,19 +64,20 @@ InvestmentsAccount.prototype.getInterestBySecurity = function (security) {
  */
 InvestmentsAccount.prototype.getIncomeOrCarryAmountByBySecurity = function(type, security) {
   if ((type !== InvestmentType.CARRY_CHARGE) && (type !== InvestmentType.DIVIDEND) && (type !== InvestmentType.INTEREST))
-    throw "InvestmentsAccount.getIncomeOrCarryAmountByBySecurity: invalid type"
+    throw "InvestmentsAccount.getIncomeOrCarryAmountByBySecurity: invalid type";
 
   var transactions = this.transactionsSet.getTransactions(type, security);
-  var totalAmount = 0
+  var totalAmount = 0;
 
   for (var j = 0; j < transactions.length; j++) {
     totalAmount += Number(transactions[j].getAmount());
-    if (type === InvestmentType.DIVIDEND)
+    if (type === InvestmentType.DIVIDEND) {
       totalAmount += Number(transactions[j].getAmountWithheld());
+    }
   }
 
   return totalAmount;
-}
+};
 
 /**
  * @param {Security} security
@@ -78,23 +90,27 @@ InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security)
   var avgCostPerQuantity = 0, nextDate = null, gainLoss = 0; 
 
   for (var j = 0; j < orders.length; j++) {
-    if ((j + 1) < orders.length)
+    if ((j + 1) < orders.length) {
       nextDate = orders[j + 1].getTradeDate();
-    else
+    }
+    else {
       nextDate = null;
+    }
 
     order.amount = Number(orders[j].getAmount());
     order.quantity = Number(orders[j].getQuantity());
-    order.usdRate = (orders[j].getUSDRate()) ? Number(orders[j].getUSDRate()): null;
+    order.usdRate = (orders[j].getUSDRate()) ? Number(orders[j].getUSDRate()) : null;
 
     // Convert USD values to CAD
-    if (order.usdRate !== null)
+    if (order.usdRate !== null) {
       order.amount *= order.usdRate;
+    }
 
     // Catch rounding errors
     total.quantity = total.quantity + order.quantity;
-    if (Math.abs(total.quantity) < 0.001)
+    if (Math.abs(total.quantity) < 0.001) {
       total.quantity = 0;
+    }
 
     // Record gain/loss for closing transactions (sell, or buy to cover)
     if (((order.quantity < 0) && (total.quantity >= 0)) ||
@@ -102,15 +118,18 @@ InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security)
       gainLoss = (order.quantity * total.ACB ) + order.amount;
 
       if ((total.quantity === 0) || (nextDate === null) || (gainLoss >= 0) ||
-          ((gainLoss < 0) && (isBoughtBackWithin30Days(orders, j) === false)))
+          ((gainLoss < 0) && (isBoughtBackWithin30Days(orders, j) === false))) {
         total.gainLoss += gainLoss;
+      }
     }
 
     total.bookValue = getUpdatedTotalBookValue(orders, total, order, nextDate, gainLoss, j);
-    if (total.quantity !== 0)
+    if (total.quantity !== 0) {
       total.ACB = total.bookValue / total.quantity;
-    else
-      total.ACB  = 0;
+    }
+    else {
+      total.ACB = 0;
+    }
   }
 
   return {'security': security, 'totalGainLoss': total.gainLoss, 'totalQuantity': total.quantity, 'totalBookValue': total.ACB};
@@ -122,10 +141,10 @@ InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security)
  */
 InvestmentsAccount.prototype.getUniqueSecurities = function(type) {
   return this.transactionsSet.getUniqueSecurities(type);
-}
+};
 
 /**
- * @param  {[OrderTransactions]} orders
+ * @param  {Array<OrderTransactions>} orders
  * @param  {{number, number, number}} total {quantity, bookValue, ACB}
  * @param  {{string, number}} order {date, quantity, amount}
  * @param  {string} nextDate
@@ -134,26 +153,28 @@ InvestmentsAccount.prototype.getUniqueSecurities = function(type) {
  * @returns  {number} new book value after processing transactions
  */
 function getUpdatedTotalBookValue (orders, total, order, nextDate, gainLoss, n) {
-  // Expiring contract or transaction closes entire position
-  if (order.quantity !== 0 && total.quantity === 0)
+  if (order.quantity !== 0 && total.quantity === 0) {
+    // Expiring contract or transaction closes entire position
     total.bookValue = 0;
-  // Buy action
-  else if (order.quantity > 0 && total.quantity >= 0)
+  }
+  else if (order.quantity > 0 && total.quantity >= 0) {
+    // Buy action
     total.bookValue -= order.amount;
-  // Cover transaction
-  else if (order.quantity < 0 && total.quantity < 0)
+  }
+  else if (order.quantity < 0 && total.quantity < 0) {
+    // Cover transaction
     total.bookValue -= order.amount;
-  // Sell action
+  }
   else {
-    // Calculation is based on superfical loss rule
+    // Sell action. Calculation is based on superfical loss rule
     total.bookValue += (order.quantity * total.ACB);
 
-    if ((total.quantity !== 0) && isBoughtBackWithin30Days(orders, n) && (gainLoss < 0))
+    if (total.quantity !== 0 && isBoughtBackWithin30Days(orders, n) && gainLoss < 0)
       total.bookValue -= gainLoss;
   }
 
   return total.bookValue;
-};
+}
 
 /**
  * FIXME: check for short covers and buy backs in a future year
@@ -171,23 +192,18 @@ function isBoughtBackWithin30Days(orders, fromIndex) {
     quantity = orders[m][4];
 
     //FIXME: check if quantity > than previous sold amount
-    if (toDate === null)
+    if (toDate === null) {
       return false;
-    else if ((quantity > 0) && ((toDate.getTime() - fromDate.getTime()) / one_day <= 30))
+    }
+    else if ((quantity > 0) && ((toDate.getTime() - fromDate.getTime()) / one_day <= 30)) {
       return true;
-    else if (quantity > 0)
+    }
+    else if (quantity > 0) {
       return false;
+    }
   }
 
   return false;
-}
-
-// Configuration to run on node with mock data
-if (global.RUN_ON_NODE) {
-  var TransactionSet = require('./transaction_set.js').TransactionSet;
-  var InvestmentType = require('./investment_type.js').InvestmentType;
-
-  module.exports = InvestmentsAccount;
 }
 
 /**

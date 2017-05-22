@@ -1,10 +1,20 @@
 /**
- * Created by Tom on 2017-05-20.
+ * @license MIT
+ *
+ * @fileoverview Security class for all transactions. A security is made up of the securityID + account currency
+ *
+ * @author tomek32@gmail.com Tom Hosiawa
  */
 "use strict";
-global.RUN_ON_NODE = true;
+
+// Configuration to run on node with mock data
+if (typeof process !== 'undefined' && process.release.name === 'node') {
+  module.exports.Security = Security;
+}
 
 /**
+ * Security class for all transactions. A security is made up of the securityID + account currency
+ * @constructor
  * @param {string} accountCurrency, 
  * @param {string} securityID
  */
@@ -24,7 +34,3 @@ Security.prototype.getUID = function() {
 };
 
 
-// Configuration to run on node with mock data
-if (global.RUN_ON_NODE) {
-  module.exports.Security = Security;
-}

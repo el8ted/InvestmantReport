@@ -1,11 +1,28 @@
 /**
- * Created by Tom on 2017-05-01.
+ * @license MIT
+ *
+ * @fileoverview Collection of transaction classes supported in investment report
+ *
+ * @author tomek32@gmail.com Tom Hosiawa
  */
 "use strict";
-global.RUN_ON_NODE = true;
+
+// Configuration to run on node with mock data
+if (typeof process !== 'undefined' && process.release.name === 'node') {
+  var Security = require('./security.js').Security;
+
+  module.exports.BaseTransaction = BaseTransaction;
+  module.exports.DividendTransaction = DividendTransaction;
+  module.exports.InterestTransaction = InterestTransaction;
+  module.exports.CarryChargeTransaction = CarryChargeTransaction;
+  module.exports.OrderTransaction = OrderTransaction;
+  module.exports.OptionOrderTransaction = OptionOrderTransaction;
+}
+
 
 /**
- * Base transection object
+ * Base transaction class that is extended by specific transaction
+ * @constructor
  * @param  {string} accountCurrency
  * @param  {string} securityID
  * @param  {string} tradeDate
@@ -19,15 +36,16 @@ function BaseTransaction(accountCurrency, securityID, tradeDate, amount, usdRate
   this.usdRate = (typeof usdRate !== 'undefined') ?  usdRate : null;
 }
 
+BaseTransaction.prototype.getAmount = function() { return this.amount; };
 BaseTransaction.prototype.getInvestmentType = function() { return 'TRANSACTION'; };
 BaseTransaction.prototype.getSecurity = function() { return this.security; };
 BaseTransaction.prototype.getTradeDate = function() { return this.tradeDate; };
-BaseTransaction.prototype.getAmount = function() { return this.amount; };
 BaseTransaction.prototype.getUSDRate = function() { return this.usdRate; };
 
 
 /**
- * Extends Base Transaction
+ * Dividend transaction class (extends BaseTransaction class)
+ * @constructor
  * @param  {string} accountCurrency
  * @param  {string} securityID
  * @param  {string} tradeDate
@@ -38,11 +56,10 @@ BaseTransaction.prototype.getUSDRate = function() { return this.usdRate; };
 function DividendTransaction(accountCurrency, securityID, tradeDate, amount, usdRate, quantity) {
   if (typeof amount !== 'undefined') {
     if (amount >= 0) {
-      amount = amount;
       this.amountWithheld = null;
     } else {
       this.amountWithheld = amount;
-      amount = null;
+      amount = 'undefined';
     }
   }
 
@@ -52,18 +69,19 @@ function DividendTransaction(accountCurrency, securityID, tradeDate, amount, usd
 
 DividendTransaction.prototype = Object.create(BaseTransaction.prototype);
 DividendTransaction.prototype.constructor = DividendTransaction;
-DividendTransaction.prototype.getInvestmentType = function() { return 'DIVIDEND'; };
 DividendTransaction.prototype.getAmountWithheld = function() { return this.amountWithheld; };
+DividendTransaction.prototype.getInvestmentType = function() { return 'DIVIDEND'; };
 DividendTransaction.prototype.getQuantity = function() { return this.quantity; };
 
 
 /**
- * Extends Base Transaction
+ * Interest transaction class (extends BaseTransaction class)
+ * @constructor
  * @param  {string} accountCurrency
  * @param  {string} securityID
- * @param  {} tradeDate
- * @param  {} amount
- * @param  {} usdRate optional
+ * @param  {string} tradeDate
+ * @param  {number} amount
+ * @param  {number} usdRate optional
  */
 function InterestTransaction(accountCurrency, securityID, tradeDate, amount, usdRate) {
   BaseTransaction.call(this, accountCurrency, securityID, tradeDate, amount, usdRate);
@@ -75,7 +93,8 @@ InterestTransaction.prototype.getInvestmentType = function() { return 'INTEREST'
 
 
 /**
- * Extends Base Transaction
+ * Carry Charge transaction class (extends BaseTransaction class)
+ * @constructor
  * @param  {string} accountCurrency
  * @param  {string} securityID
  * @param  {string} tradeDate
@@ -92,8 +111,9 @@ CarryChargeTransaction.prototype.getInvestmentType = function() { return 'CARRY_
 
 
 /**
- * Extends Base Transaction
- * TODO: add support for commission, exchange traded debentures
+ * Order transaction class (extends BaseTransaction class)
+ * TODO: add support for exchange traded debentures
+ * @constructor
  * @param  {string} accountCurrency
  * @param  {string} securityID
  * @param  {string} tradeDate
@@ -113,8 +133,9 @@ OrderTransaction.prototype.getQuantity = function() { return this.quantity; };
 
 
 /**
- * Extends Order Transaction
- * TODO: add support for commission
+ * Option Order transaction class (extends BaseTransaction class)
+ * TODO: add support for non-standard multipler
+ * @constructor
  * @param  {string} accountCurrency
  * @param  {string} securityID
  * @param  {string} tradeDate
@@ -132,16 +153,3 @@ OptionOrderTransaction.prototype = Object.create(OrderTransaction.prototype);
 OptionOrderTransaction.prototype.constructor = OptionOrderTransaction;
 OptionOrderTransaction.prototype.getInvestmentType = function() { return 'OPTION_ORDER'; };
 OptionOrderTransaction.prototype.getMultiplier = function() { return this.multiplier; };
-
-
-// Configuration to run on node with mock data
-if (global.RUN_ON_NODE) {
-  var Security = require('./security.js').Security;
-
-  module.exports.BaseTransaction = BaseTransaction;
-  module.exports.DividendTransaction = DividendTransaction;
-  module.exports.InterestTransaction = InterestTransaction;
-  module.exports.CarryChargeTransaction = CarryChargeTransaction;
-  module.exports.OrderTransaction = OrderTransaction;
-  module.exports.OptionOrderTransaction = OptionOrderTransaction;
-}

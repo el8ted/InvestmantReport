@@ -3,9 +3,15 @@
  * Class to interact with putting data into report of the active sheet
  */
 "use strict";
-if (global === undefined)
-  var global = {};
-global.RUN_ON_NODE = true;
+
+// Configuration to run on node with mock data
+if (typeof process !== 'undefined' && process.release.name === 'node') {
+  var Security = require('./security.js').Security;
+  var InvestmentType = require('./investment_type.js').InvestmentType;
+  var InvestmentsAccount = require('./investments_account.js');
+
+  module.exports.InvestmentSheetReport = InvestmentSheetReport;
+}
 
 var SheetConfig = {
   totalsStartCell: 'K1',
@@ -22,11 +28,11 @@ function InvestmentSheetReport() {
 }
 
 /**
- * @param  {Parent of BaseTransaction} transaction
+ * @param  {BaseTransaction} transaction
  */
 InvestmentSheetReport.prototype.addTransaction = function(transaction) {
   this.investmentsAccount.addTransaction(transaction);
-}
+};
 
 /**
  * @returns { totals: {carryChage: {CAD: 0, USD: 0},
@@ -41,7 +47,7 @@ InvestmentSheetReport.prototype.addTransaction = function(transaction) {
 InvestmentSheetReport.prototype.getReport = function() {
   this.refreshReport();
   return this.report;
-}
+};
 
 /**
  * @param {InvestmentType} type
@@ -70,7 +76,7 @@ InvestmentSheetReport.prototype.getSecurityListByType = function (type) {
       }
 
   return report;
-}
+};
 
 /**
  * @returns {{CARRY_CHARGE: [{}], DIVIDEND: [], INTEREST: [], GAIN_LOSS: [] }}
@@ -92,29 +98,22 @@ InvestmentSheetReport.prototype.refreshReport = function() {
   // refresh totals
   var investmentTypes = ['carryCharge', 'dividend', 'interest', 'gainLoss'];
   for (var type in investmentTypes) {
-    type = investmentTypes[type];
+    if (investmentTypes.hasOwnProperty(type)) {
+      var typeValue = investmentTypes[type];
 
-    for (var j = 0; j < this.report.securityListByType[type].length; j++) {  
-      var currency = this.report.securityListByType[type][j].security.getAccountCurrency();
-      var amount;
+      for (var j = 0; j < this.report.securityListByType[typeValue].length; j++) {
+        var currency = this.report.securityListByType[typeValue][j].security.getAccountCurrency();
+        var amount;
 
-      if (type === 'gainLoss')
-        amount = this.report.securityListByType[type][j].totalGainLoss;
-      else
-        amount = this.report.securityListByType[type][j].amount;
-      
-      this.report.totals[type][currency] += amount;
+        if (type === 'gainLoss')
+          amount = this.report.securityListByType[typeValue][j].totalGainLoss;
+        else
+          amount = this.report.securityListByType[typeValue][j].amount;
+
+        this.report.totals[typeValue][currency] += amount;
+      }
     }
   }
 
   return this.report;
-}
-
-// Configuration to run on node with mock data
-if (global.RUN_ON_NODE) {
-  var Security = require('./security.js').Security;
-  var InvestmentType = require('./investment_type.js').InvestmentType;
-  var InvestmentsAccount = require('./investments_account.js');
-
-  module.exports.InvestmentSheetReport = InvestmentSheetReport;
-}
+};
