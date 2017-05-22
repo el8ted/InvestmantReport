@@ -23,7 +23,9 @@ function TransactionSet() {
   this.transactionsList = {};
 
   for (var key in InvestmentType) {
-    this.transactionsList[key] = [];
+    if (InvestmentType.hasOwnProperty(key)) {
+      this.transactionsList[key] = [];
+    }
   }
 }
 

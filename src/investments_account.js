@@ -18,6 +18,7 @@ if (typeof process !== 'undefined' && process.release.name === 'node') {
 
 /**
  * InvestmentsAccount class
+ * @constructor
  */
 function InvestmentsAccount() {
   this.transactionsSet = new TransactionSet();
@@ -32,65 +33,42 @@ InvestmentsAccount.prototype.addTransaction = function (transaction) {
 
 /**
  * @param {Security} security
- * @return {{security, amount}}
+ * @return {number}
  */
-InvestmentsAccount.prototype.getCarryChargeBySecurity = function (security) {
-  var amount = this.getIncomeOrCarryAmountByBySecurity(InvestmentType.CARRY_CHARGE, security);
-  return {'security': security, 'amount': amount};
+InvestmentsAccount.prototype.getTotalCarryChargeBySecurity = function (security) {
+  return getIncomeOrCarryAmountBySecurity(this, InvestmentType.CARRY_CHARGE, security);
 };
 
 /**
  * @param {Security} security
- * @return {{security, amount}}
+ * @return {number}
  */
-InvestmentsAccount.prototype.getDividendBySecurity = function (security) {
-  var amount = this.getIncomeOrCarryAmountByBySecurity(InvestmentType.DIVIDEND, security);
-  return {'security': security, 'amount': amount};
+InvestmentsAccount.prototype.getTotalDividendBySecurity = function (security) {
+  return getIncomeOrCarryAmountBySecurity(this, InvestmentType.DIVIDEND, security);
 };
 
 /**
  * @param {Security} security
- * @return {{security, amount}}
+ * @return {number}
  */
-InvestmentsAccount.prototype.getInterestBySecurity = function (security) {
-  var amount = this.getIncomeOrCarryAmountByBySecurity(InvestmentType.INTEREST, security);
-  return {'security': security, 'amount': amount};
-};
-
-/**
- * @param {InvestmentType} type must be CARRY_CHARGE, DIVIDEND, or INTEREST
- * @param {Security} security
- * @returns {Number} returns sum amount of transactions matching type and security
- */
-InvestmentsAccount.prototype.getIncomeOrCarryAmountByBySecurity = function(type, security) {
-  if ((type !== InvestmentType.CARRY_CHARGE) && (type !== InvestmentType.DIVIDEND) && (type !== InvestmentType.INTEREST))
-    throw "InvestmentsAccount.getIncomeOrCarryAmountByBySecurity: invalid type";
-
-  var transactions = this.transactionsSet.getTransactions(type, security);
-  var totalAmount = 0;
-
-  for (var j = 0; j < transactions.length; j++) {
-    totalAmount += Number(transactions[j].getAmount());
-    if (type === InvestmentType.DIVIDEND) {
-      totalAmount += Number(transactions[j].getAmountWithheld());
-    }
-  }
-
-  return totalAmount;
+InvestmentsAccount.prototype.getTotalInterestBySecurity = function (security) {
+  return getIncomeOrCarryAmountBySecurity(this, InvestmentType.INTEREST, security);
 };
 
 /**
  * @param {Security} security
- * @returns {{security, totalGainLoss, totalQuantity, totalBookValue}}
+ * @returns {{gainLoss, quantity, bookValue}}
  */
-InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security) {
+InvestmentsAccount.prototype.getTotalRealizedGainLossBySecurity = function (security) {
   var orders = this.transactionsSet.getTransactions(InvestmentType.ORDERS, security);
   var total = {bookValue: 0, gainLoss: 0, quantity: 0, ACB: 0};
   var order = {date: null, amount: 0, quantity: 0, usdRate: null};
-  var avgCostPerQuantity = 0, nextDate = null, gainLoss = 0; 
+  var avgCostPerQuantity = 0;
+  var nextDate = null;
+  var gainLoss = 0; 
 
-  for (var j = 0; j < orders.length; j++) {
-    if ((j + 1) < orders.length) {
+  for (var j = 0, length = order.length; j < length; j++) {
+    if ((j + 1) < length) {
       nextDate = orders[j + 1].getTradeDate();
     }
     else {
@@ -132,27 +110,55 @@ InvestmentsAccount.prototype.getRealizedGainLossBySecurity = function (security)
     }
   }
 
-  return {'security': security, 'totalGainLoss': total.gainLoss, 'totalQuantity': total.quantity, 'totalBookValue': total.ACB};
+  return {'gainLoss': total.gainLoss, 'quantity': total.quantity, 'bookValue': total.ACB};
 };
 
 /**
  * @param {InvestmentType} type
- * @returns {[Security]} of unique securities matching investment type
+ * @returns {Security[]} of unique securities matching investment type
  */
 InvestmentsAccount.prototype.getUniqueSecurities = function(type) {
+  if (typeof InvestmentType[type] === 'undefined') {
+    throw "InvestmentsAccount.getUniqueSecurities: invalid type"
+  }
+
   return this.transactionsSet.getUniqueSecurities(type);
 };
 
 /**
- * @param  {Array<OrderTransactions>} orders
+ * @param {InvestmentsAccount} investmentAccount
+ * @param {InvestmentType} type must be CARRY_CHARGE, DIVIDEND, or INTEREST
+ * @param {Security} security
+ * @returns {number} returns sum amount of transactions matching type and security
+ */
+function getIncomeOrCarryAmountBySecurity(investmentAccount, type, security) {
+  if (typeof InvestmentType[type] === 'undefined' || type === InvestmentType.ORDER)  {
+    throw "InvestmentsAccount.getIncomeOrCarryAmountByBySecurity: invalid type"
+  }
+
+  var transactions = investmentAccount.transactionsSet.getTransactions(type, security);
+  var totalAmount = 0;
+
+  for (var j = 0, length = transactions.length; j < length; j++) {
+    totalAmount += Number(transactions[j].getAmount());
+    if (type === InvestmentType.DIVIDEND) {
+      totalAmount += Number(transactions[j].getAmountWithheld());
+    }
+  }
+
+  return totalAmount;
+};
+
+/**
+ * @param  {OrderTransaction[]} orders
  * @param  {{number, number, number}} total {quantity, bookValue, ACB}
  * @param  {{string, number}} order {date, quantity, amount}
  * @param  {string} nextDate
  * @param  {number} gainLoss
  * @param  {number} n
- * @returns  {number} new book value after processing transactions
+ * @returns {number} new book value after processing transactions
  */
-function getUpdatedTotalBookValue (orders, total, order, nextDate, gainLoss, n) {
+function getUpdatedTotalBookValue(orders, total, order, nextDate, gainLoss, n) {
   if (order.quantity !== 0 && total.quantity === 0) {
     // Expiring contract or transaction closes entire position
     total.bookValue = 0;
@@ -177,13 +183,13 @@ function getUpdatedTotalBookValue (orders, total, order, nextDate, gainLoss, n) 
 }
 
 /**
- * FIXME: check for short covers and buy backs in a future year
- * @param {[OrderTransaction]} orders
+ * @param {OrderTransaction[]} orders
  * @param {number} fromIndex
  * @returns {boolean} true if bought back within 30 calendar days fromIndex in orders
  */
 function isBoughtBackWithin30Days(orders, fromIndex) {
-  var fromDate = new Date(orders[fromIndex][0]), toDate = null;
+  var fromDate = new Date(orders[fromIndex][0]);
+  var toDate = null;
   var quantity = 0;
   var one_day = 1000 * 60 * 60 * 24; // seconds in an hour
 
@@ -191,7 +197,8 @@ function isBoughtBackWithin30Days(orders, fromIndex) {
     toDate = new Date(orders[m][0]);
     quantity = orders[m][4];
 
-    //FIXME: check if quantity > than previous sold amount
+    // FIXME: check if quantity > than previous sold amount
+    // FIXME: check for short covers and buy backs in a future year
     if (toDate === null) {
       return false;
     }
@@ -205,24 +212,3 @@ function isBoughtBackWithin30Days(orders, fromIndex) {
 
   return false;
 }
-
-/**
- * Performs gain/loss calculation
- * @param totalQuantity
- * @param totalBookValue
- * @param avgCostPerQuantity
- * @param date
- * @param quantity
- * @param amount
- *
-function calculateGainLoss(totalQuantity, totalBookValue, avgCostPerQuantity, date, quantity, amount) {
-  var gainLoss = 0, totalGainLoss = 0;
-
-  if (quantity < 0) {
-    gainLoss = (quantity * avgCostPerQuantity) + amount;
-    this.orders[j][6] = gainLoss;
-    totalGainLoss = totalGainLoss + gainLoss;
-  }
-
-  avgCostPerQuantity = totalBookValue / totalQuantity;
-}*/
