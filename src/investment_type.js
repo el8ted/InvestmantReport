@@ -8,7 +8,7 @@ var InvestmentType = {
   'INTEREST': 'INTEREST',
   'CARRY_CHARGE': 'CARRY_CHARGE',
   'DIVIDEND': 'DIVIDEND',
-  'ORDERS': 'ORDER'
+  'ORDER': 'ORDER'
 };
 
 // Configuration to run on node with mock data
